@@ -1,19 +1,17 @@
 # Zima Display
 
-[简体中文](README.zh-CN.md) | English
-
 Zima Display is a native HDMI output controller for ZimaOS. It adds a control panel to the ZimaOS sidebar and can show a live system dashboard, an ambient clock, local or network media, a black standby screen, or the original system terminal.
 
 It is installed as a `zpkg` / `systemd-sysext` `.raw` package. Docker is not required.
 
 ## Features
 
-- Native ZimaOS sidebar UI with Simplified Chinese and English support.
+- Native ZimaOS sidebar UI that follows ZimaOS's language — interface translations for all 29 dashboard locales, not just Chinese and English.
 - HDMI dashboard with CPU, memory, storage, network, temperature, GPU, IP, OS and connector status.
 - Dashboard font scaling from 80% to 200%, automatic/standard/large layouts, and a live HDMI-accurate preview.
 - Free Canvas mode with draggable and resizable widgets, per-widget typography, custom text and live preview.
 - System overview, giant clock and minimal canvas templates with solid, gradient and uploaded-image backgrounds.
-- One language selector synchronizes the browser UI and HDMI dashboard.
+- The display language follows ZimaOS automatically, keeping the web UI, canvas previews and HDMI output in sync.
 - Dashboard, clock, black standby, media playback and terminal modes.
 - Local video and image browser, playback queue and uploads up to 20 GB.
 - HTTP, HTTPS, HLS and RTSP network playback.
