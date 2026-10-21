@@ -13,14 +13,16 @@ It is installed as a `zpkg` / `systemd-sysext` `.raw` package. Docker is not req
 - Dashboard font scaling from 80% to 200%, automatic/standard/large layouts, and a live HDMI-accurate preview.
 - Free Canvas mode with draggable and resizable widgets, per-widget typography, custom text and live preview.
 - System overview, giant clock and minimal canvas templates with solid, gradient and uploaded-image backgrounds.
+- Remote Linux and ZimaOS metrics over SSH, selectable per CPU, memory, storage, network, temperature, IP and hostname widget.
 - One language selector synchronizes the browser UI and HDMI dashboard.
 - Dashboard, clock, black standby, media playback and terminal modes.
-- Local video and image browser, infinitely looping playback queue and uploads up to 20 GB.
-- Exhibition slideshow mode that loops images from a chosen folder in filename order with an adjustable interval.
+- Local video and image browser, configurable repeat/stop behavior, and uploads up to 20 GB.
+- Exhibition slideshow mode with filename ordering, an adjustable interval and configurable collection repeat/stop behavior.
+- On-demand current-screen preview captured from the actual mpv media output.
 - HTTP, HTTPS, HLS and RTSP network playback.
 - Playback, seek, playlist and HDMI volume controls.
 - Persistent configuration under `/DATA/AppData/zima-display`.
-- Renderer recovery and a boot watchdog for ZimaOS system extensions.
+- Renderer recovery, boot-scoped software DRM fallback and a watchdog for ZimaOS system extensions.
 - One-click DeepSeek Harness integration with automatic Store-container volume discovery.
 - Markdown, PPTX, PDF and image-deck presentation with page navigation.
 
@@ -58,7 +60,7 @@ http://<zimaos-host>/modules/zima-display/index.html
 3. Customize the System dashboard title, layout, type size and preview in the main Ready-made workspace. Settings only chooses which configured mode opens at startup.
 4. In **Free canvas**, apply a template or add widgets, drag to position, resize from the lower-right corner, or enter exact X/Y/W/H values.
 5. Customize each widget's font size, color and weight, and choose a solid, gradient or uploaded-image background.
-6. Use Settings for startup behavior, Display output, media folders, remote data sources and screen maintenance.
+6. Use Settings for startup behavior, Display output, media playback defaults, media folders, remote data sources and screen maintenance.
 7. Use the media panel to browse files, upload media, or play a network URL.
 
 The web UI follows the browser language on first use. A manual language selection synchronizes the web UI and HDMI dashboard, and is stored both in the browser and the device `config.json`.
