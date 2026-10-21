@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Zima Display</title>
     <link rel="icon" type="image/svg+xml" href="appicon.svg">
-    <link rel="stylesheet" href="styles.css?v=0.4.2">
+    <link rel="stylesheet" href="styles.css?v=0.4.3">
   </head>
   <body>
     <div class="grain" aria-hidden="true"></div>
@@ -33,96 +33,81 @@
     </header>
 
     <main>
-      <section class="hero-grid">
-        <article class="screen-card reveal delay-1">
-          <div class="card-kicker"><span data-i18n="preview.liveOutput">实时输出</span><span id="connectorName">自动检测</span></div>
-          <div class="screen-preview" id="screenPreview">
-            <div id="liveScenePreview" class="scene-preview" hidden></div>
-            <div class="preview-grid"></div>
-            <div class="preview-status">
-              <span id="previewMode">系统仪表盘</span>
-              <strong id="previewClock">--:--</strong>
-              <small id="previewTitle">Zima Display</small>
-            </div>
-            <div class="screen-foot">
-              <span id="displayState">等待显示器</span>
-              <span id="displayMode">首选分辨率</span>
-            </div>
-          </div>
-          <div class="now-playing">
-            <div>
-              <small data-i18n="player.nowPlaying">当前内容</small>
-              <strong id="mediaTitle">系统仪表盘</strong>
-              <span id="mediaPath">HDMI 输出由 Zima Display 管理</span>
-            </div>
-            <div class="transport">
-              <button type="button" data-action="previous" aria-label="上一个" data-i18n-aria-label="player.previous">&#9664;&#9664;</button>
-              <button id="playPauseButton" type="button" data-action="pause" class="transport-main" aria-label="暂停" data-i18n-aria-label="player.pause">&#10074;&#10074;</button>
-              <button type="button" data-action="next" aria-label="下一个" data-i18n-aria-label="player.next">&#9654;&#9654;</button>
-              <button type="button" data-action="stop" aria-label="停止" data-i18n-aria-label="player.stop">&#9632;</button>
-            </div>
-          </div>
-          <div class="progress-row">
-            <span id="positionTime">00:00</span>
-            <input id="progressRange" type="range" min="0" max="100" value="0" aria-label="播放进度" data-i18n-aria-label="player.progress">
-            <span id="durationTime">00:00</span>
-          </div>
-        </article>
-
-        <aside class="control-rail reveal delay-2">
-          <div class="rail-heading">
-            <span data-i18n="modes.heading">输出模式</span>
-            <small data-i18n="modes.hint">一键切换 HDMI 内容</small>
-          </div>
-          <button class="mode-button active" type="button" data-mode="dashboard">
-            <span class="mode-index">01</span><span><b data-i18n="modes.dashboard">系统仪表盘</b><small data-i18n="modes.dashboardHint">性能、存储与网络</small></span><i></i>
-          </button>
-          <button class="mode-button" type="button" data-mode="canvas">
-            <span class="mode-index">02</span><span><b data-i18n="modes.canvas">自由画布</b><small data-i18n="modes.canvasHint">自定义组件、位置与背景</small></span><i></i>
-          </button>
-          <button class="mode-button" type="button" data-mode="clock">
-            <span class="mode-index">03</span><span><b data-i18n="modes.clock">环境时钟</b><small data-i18n="modes.clockHint">低干扰常亮信息</small></span><i></i>
-          </button>
-          <button class="mode-button" type="button" data-mode="black">
-            <span class="mode-index">04</span><span><b data-i18n="modes.black">黑屏待机</b><small data-i18n="modes.blackHint">播放器保持在线</small></span><i></i>
-          </button>
-          <button class="mode-button terminal" type="button" data-mode="terminal">
-            <span class="mode-index">05</span><span><b data-i18n="modes.terminal">恢复终端</b><small data-i18n="modes.terminalHint">释放 HDMI 与 TTY1</small></span><i></i>
-          </button>
-          <div class="volume-block">
-            <div><span data-i18n="player.volume">HDMI 音量</span><b id="volumeValue">70%</b></div>
-            <input id="volumeRange" type="range" min="0" max="100" value="70" aria-label="HDMI 音量" data-i18n-aria-label="player.volume">
-          </div>
-        </aside>
+      <section class="guided-intro reveal">
+        <div>
+          <span data-i18n="home.kicker">开始使用</span>
+          <h1 data-i18n="home.heading">你想让屏幕显示什么？</h1>
+          <p data-i18n="home.description">先选择一种内容。页面只会展开完成这件事需要的工具。</p>
+        </div>
+        <div class="current-output-summary">
+          <div><small data-i18n="player.nowPlaying">当前内容</small><strong id="mediaTitle">系统仪表盘</strong><span id="mediaPath">HDMI 输出由 Zima Display 管理</span></div>
+          <button id="viewCurrentOutputButton" class="button" type="button" data-i18n="home.viewCurrent">查看当前屏幕</button>
+        </div>
       </section>
 
-      <section class="metrics-grid reveal delay-3" aria-label="系统指标" data-i18n-aria-label="metrics.aria">
-        <article class="metric-card accent">
-          <span data-i18n="metrics.cpu">CPU 负载</span><strong id="cpuMetric">--</strong><small id="loadMetric">负载 --</small><div class="meter"><i id="cpuBar"></i></div>
-        </article>
-        <article class="metric-card">
-          <span data-i18n="metrics.memory">内存</span><strong id="memoryMetric">--</strong><small id="memoryDetail">-- / --</small><div class="meter"><i id="memoryBar"></i></div>
-        </article>
-        <article class="metric-card">
-          <span data-i18n="metrics.storage">存储</span><strong id="diskMetric">--</strong><small id="diskDetail">-- / --</small><div class="meter amber"><i id="diskBar"></i></div>
-        </article>
-        <article class="metric-card compact">
-          <span data-i18n="metrics.network">网络</span><div><b>&darr; <em id="networkDown">--</em></b><b>&uarr; <em id="networkUp">--</em></b></div><small id="ipAddress">等待网络</small>
-        </article>
-        <article class="metric-card compact">
-          <span data-i18n="metrics.thermal">温度 / GPU</span><div><b><em id="temperatureMetric">--</em>&deg;C</b></div><small id="gpuName">自动检测</small>
-        </article>
+      <section class="content-picker reveal delay-1" aria-labelledby="contentPickerHeading">
+        <div class="guided-section-heading"><span>01</span><div><h2 id="contentPickerHeading" data-i18n="home.chooseHeading">选择内容类型</h2><p data-i18n="home.chooseDescription">三种方式互不干扰，一次只处理一种。</p></div></div>
+        <div class="content-choice-grid">
+          <button class="content-choice active" type="button" data-workspace-choice="dashboard" aria-pressed="true">
+            <span class="choice-number">01</span><span class="choice-icon" aria-hidden="true">◫</span><span><b data-i18n="home.choiceDashboard">使用现成画面</b><small data-i18n="home.choiceDashboardHint">直接显示系统状态或时钟</small></span><em data-i18n="settings.recommended">推荐</em>
+          </button>
+          <button class="content-choice" type="button" data-workspace-choice="canvas" aria-pressed="false">
+            <span class="choice-number">02</span><span class="choice-icon" aria-hidden="true">⌗</span><span><b data-i18n="home.choiceCanvas">设计自由画布</b><small data-i18n="home.choiceCanvasHint">从模板开始，再调整组件和背景</small></span><i aria-hidden="true">→</i>
+          </button>
+          <button class="content-choice" type="button" data-workspace-choice="media" aria-pressed="false">
+            <span class="choice-number">03</span><span class="choice-icon" aria-hidden="true">▶</span><span><b data-i18n="home.choiceMedia">播放照片或视频</b><small data-i18n="home.choiceMediaHint">选择文件、文件夹或网络地址</small></span><i aria-hidden="true">→</i>
+          </button>
+        </div>
       </section>
 
-      <section class="canvas-panel reveal delay-4">
+      <section id="dashboardWorkspace" class="guided-workspace reveal delay-2" data-workspace-panel="dashboard">
+        <div class="guided-section-heading"><span>02</span><div><h2 data-i18n="home.presetHeading">选择一个现成画面</h2><p data-i18n="home.presetDescription">适合第一次使用，点击后立即显示到 HDMI。</p></div></div>
+        <div class="preset-grid">
+          <button class="mode-button preset-card active" type="button" data-mode="dashboard">
+            <span class="preset-visual dashboard-visual"><i></i><i></i><i></i></span><span><b data-i18n="modes.dashboard">系统仪表盘</b><small data-i18n="modes.dashboardHint">性能、存储与网络</small></span><em data-i18n="home.showNow">立即显示</em>
+          </button>
+          <button class="mode-button preset-card" type="button" data-mode="clock">
+            <span class="preset-visual clock-visual">12:48</span><span><b data-i18n="modes.clock">环境时钟</b><small data-i18n="modes.clockHint">低干扰常亮信息</small></span><em data-i18n="home.showNow">立即显示</em>
+          </button>
+        </div>
+        <section id="dashboardEditorPanel" class="dashboard-editor-panel">
+          <div class="section-heading">
+            <div><span>03 / <span data-i18n="dashboard.editorKicker">仪表盘编辑</span></span><h2 data-i18n="dashboard.editorHeading">调整系统仪表盘</h2><p class="section-description" data-i18n="dashboard.editorDescription">修改标题、布局和字号。保存前只影响这里的预览。</p></div>
+            <div class="section-actions"><button id="saveDashboardButton" class="button ghost" type="button" data-i18n="dashboard.save">保存设置</button><button id="applyDashboardButton" class="button primary" type="button" data-i18n="dashboard.apply">保存并投到 HDMI</button></div>
+          </div>
+          <div class="dashboard-settings-layout">
+            <div class="settings-card dashboard-controls">
+              <label class="settings-field"><span data-i18n="settings.dashboardTitle">仪表盘标题</span><input id="dashboardTitleInput" type="text" maxlength="64"><small data-i18n="settings.dashboardTitleHint">显示在仪表盘左上方。</small></label>
+              <label class="settings-field"><span data-i18n="settings.dashboardLanguage">显示语言</span><select id="dashboardLanguageInput"><option value="zh-CN">简体中文</option><option value="en-US">English</option></select><small data-i18n="settings.dashboardLanguageHint">同时作为 Web 控制页的语言。</small></label>
+              <label class="settings-field"><span data-i18n="settings.dashboardLayout">仪表盘布局</span><select id="dashboardLayoutInput"><option value="auto" data-i18n="settings.layoutAuto">自动适配</option><option value="standard" data-i18n="settings.layoutStandard">标准布局</option><option value="large" data-i18n="settings.layoutLarge">大字布局</option></select><small data-i18n="settings.dashboardLayoutHint">自动会根据显示器尺寸选择更易读的布局。</small></label>
+              <label class="settings-field range-field"><span><span data-i18n="settings.fontScale">字体大小</span><output id="fontScaleValue">100%</output></span><input id="fontScaleInput" type="range" min="80" max="200" step="5" value="100"><small data-i18n="settings.fontScaleHint">大字号会自动降低超大数字的缩放幅度，避免内容互相遮挡。</small></label>
+              <button id="resetDashboardButton" class="button ghost" type="button" data-i18n="settings.resetDashboard">恢复仪表盘默认</button>
+            </div>
+            <section class="dashboard-preview-panel">
+              <div class="preview-toolbar"><div><b data-i18n="settings.previewHeading">仪表盘预览</b><small data-i18n="settings.previewHint">使用与 HDMI 相同的场景数据和坐标。</small></div><select id="previewResolutionInput" aria-label="预览分辨率" data-i18n-aria-label="settings.previewResolution"><option value="current" data-i18n="settings.previewCurrent">当前显示器</option><option value="1024x600">1024 × 600</option><option value="1280x720">1280 × 720</option><option value="1920x1080">1920 × 1080</option><option value="3840x2160">3840 × 2160</option></select></div>
+              <div id="dashboardScenePreview" class="scene-preview dashboard-scene-preview"></div>
+            </section>
+          </div>
+        </section>
+      </section>
+
+      <section id="canvasWorkspace" class="canvas-panel guided-workspace reveal delay-2" data-workspace-panel="canvas" hidden>
         <div class="section-heading canvas-heading">
-          <div><span data-i18n="canvas.kicker">布局工作室</span><h2 data-i18n="canvas.heading">自由画布</h2><p data-i18n="canvas.description">拖动组件调整位置，拖动右下角改变大小。保存前不会改变 HDMI。</p></div>
+          <div><span>02 / <span data-i18n="canvas.kicker">布局工作室</span></span><h2 data-i18n="canvas.heading">自由画布</h2><p data-i18n="canvas.description">先选模板，再拖动组件调整。保存前不会改变 HDMI。</p></div>
           <div class="section-actions"><button id="saveCanvasButton" class="button ghost" type="button" data-i18n="canvas.save">保存布局</button><button id="applyCanvasButton" class="button primary" type="button" data-i18n="canvas.apply">保存并投到 HDMI</button></div>
+        </div>
+        <div class="canvas-template-start">
+          <div><b data-i18n="canvas.templateHeading">从模板开始</b><small data-i18n="canvas.templateDescription">模板只提供起点，应用后仍可自由修改。</small></div>
+          <div class="canvas-template-cards">
+            <button type="button" data-canvas-template="overview"><span class="template-mini overview-mini"></span><b data-i18n="canvas.templateOverview">系统概览</b></button>
+            <button type="button" data-canvas-template="clock"><span class="template-mini clock-mini">12:48</span><b data-i18n="canvas.templateClock">巨型时钟</b></button>
+            <button type="button" data-canvas-template="minimal"><span class="template-mini minimal-mini"></span><b data-i18n="canvas.templateMinimal">极简状态</b></button>
+          </div>
+          <select id="canvasTemplateInput" hidden><option value="overview">系统概览</option><option value="clock">巨型时钟</option><option value="minimal">极简状态</option></select>
+          <button id="applyCanvasTemplateButton" type="button" hidden>应用模板</button>
         </div>
         <div class="canvas-workspace">
           <aside class="canvas-tools">
-            <label><span data-i18n="canvas.template">布局模板</span><select id="canvasTemplateInput"><option value="overview" data-i18n="canvas.templateOverview">系统概览</option><option value="clock" data-i18n="canvas.templateClock">巨型时钟</option><option value="minimal" data-i18n="canvas.templateMinimal">极简状态</option></select></label>
-            <button id="applyCanvasTemplateButton" class="button dark" type="button" data-i18n="canvas.useTemplate">应用模板</button>
             <label><span data-i18n="canvas.backgroundType">背景类型</span><select id="canvasBackgroundTypeInput"><option value="solid" data-i18n="canvas.backgroundSolid">纯色</option><option value="gradient" data-i18n="canvas.backgroundGradient">渐变</option><option value="image" data-i18n="canvas.backgroundImage">图片</option></select></label>
             <div class="color-pair"><label><span data-i18n="canvas.primaryColor">主色</span><input id="canvasBackgroundColorInput" type="color" value="#151411"></label><label><span data-i18n="canvas.secondaryColor">辅色</span><input id="canvasSecondaryColorInput" type="color" value="#30251d"></label></div>
             <label><span data-i18n="canvas.backgroundPath">背景图片</span><input id="canvasBackgroundImageInput" type="text" placeholder="/DATA/..."></label>
@@ -131,6 +116,7 @@
             <div id="canvasInspector" class="canvas-inspector disabled">
               <b data-i18n="canvas.inspector">所选组件</b>
               <label><span data-i18n="canvas.text">文字</span><input id="canvasWidgetTextInput" type="text"></label>
+              <label id="canvasSourceField" hidden><span data-i18n="canvas.source">数据来源</span><select id="canvasWidgetSourceInput"></select><small data-i18n="canvas.sourceHint">本机或设置中添加的远程设备</small></label>
               <div class="canvas-number-grid"><label>X<input id="canvasWidgetXInput" type="number" min="0" max="1840"></label><label>Y<input id="canvasWidgetYInput" type="number" min="0" max="1050"></label><label>W<input id="canvasWidgetWidthInput" type="number" min="80" max="1920"></label><label>H<input id="canvasWidgetHeightInput" type="number" min="30" max="1080"></label></div>
               <label><span data-i18n="canvas.fontSize">字号</span><input id="canvasWidgetFontInput" type="range" min="12" max="300" step="2"><output id="canvasWidgetFontValue">--</output></label>
               <div class="color-pair"><label><span data-i18n="canvas.textColor">文字颜色</span><input id="canvasWidgetColorInput" type="color"></label><label class="toggle-inline"><span data-i18n="canvas.bold">粗体</span><input id="canvasWidgetBoldInput" type="checkbox"></label></div>
@@ -141,22 +127,9 @@
         </div>
       </section>
 
-      <section class="integration-panel reveal delay-4">
-        <div class="integration-copy">
-          <span data-i18n="dsh.kicker">智能体集成</span>
-          <h2 data-i18n="dsh.heading">DeepSeek Harness</h2>
-          <p data-i18n="dsh.description">自动发现 ZimaOS 商店版 DSH，并安装持久化投屏 Skill。无需进入容器。</p>
-        </div>
-        <div class="integration-status">
-          <span class="integration-dot" aria-hidden="true"></span>
-          <strong id="dshState" data-i18n="dsh.checking">正在检查 DSH...</strong>
-        </div>
-        <button id="dshInstallButton" class="button primary" type="button" disabled data-i18n="dsh.install">一键安装 Skill</button>
-      </section>
-
-      <section class="media-panel reveal delay-4">
+      <section id="mediaWorkspace" class="media-panel guided-workspace reveal delay-2" data-workspace-panel="media" hidden>
         <div class="section-heading">
-          <div><span data-i18n="media.kicker">媒体控制台</span><h2 data-i18n="media.heading">媒体与播放队列</h2></div>
+          <div><span>02 / <span data-i18n="media.kicker">媒体播放</span></span><h2 data-i18n="media.heading">选择要播放的内容</h2><p class="section-description" data-i18n="media.description">选择文件后播放；这里不会同时显示自由画布工具。</p></div>
           <div class="section-actions">
             <button id="uploadButton" class="button ghost" type="button" data-i18n="media.upload">上传媒体</button>
             <input id="uploadInput" type="file" accept="video/*,image/*" hidden>
@@ -167,6 +140,16 @@
           <label for="urlInput" data-i18n="media.networkMedia">网络媒体</label>
           <input id="urlInput" type="url" placeholder="https://... 或 rtsp://..." data-i18n-placeholder="media.urlPlaceholder">
           <button id="playUrlButton" class="button dark" type="button" data-i18n="media.playNow">立即播放</button>
+        </div>
+        <div class="media-playback-panel">
+          <div class="transport">
+            <button type="button" data-action="previous" aria-label="上一个" data-i18n-aria-label="player.previous">&#9664;&#9664;</button>
+            <button id="playPauseButton" type="button" data-action="pause" class="transport-main" aria-label="暂停" data-i18n-aria-label="player.pause">&#10074;&#10074;</button>
+            <button type="button" data-action="next" aria-label="下一个" data-i18n-aria-label="player.next">&#9654;&#9654;</button>
+            <button type="button" data-action="stop" aria-label="停止" data-i18n-aria-label="player.stop">&#9632;</button>
+          </div>
+          <div class="progress-row"><span id="positionTime">00:00</span><input id="progressRange" type="range" min="0" max="100" value="0" aria-label="播放进度" data-i18n-aria-label="player.progress"><span id="durationTime">00:00</span></div>
+          <div class="volume-block"><div><span data-i18n="player.volume">HDMI 音量</span><b id="volumeValue">70%</b></div><input id="volumeRange" type="range" min="0" max="100" value="70" aria-label="HDMI 音量" data-i18n-aria-label="player.volume"></div>
         </div>
         <div class="browser-toolbar">
           <button id="parentButton" type="button" disabled aria-label="返回上级" data-i18n-aria-label="media.parent">&#8592;</button>
@@ -182,29 +165,141 @@
           <div class="empty-state" data-i18n="media.loading">正在读取媒体目录...</div>
         </div>
       </section>
+
+      <details id="currentOutputDetails" class="inspection-panel reveal delay-3">
+        <summary><span><b data-i18n="home.currentOutputHeading">需要确认屏幕吗？</b><small data-i18n="home.currentOutputDescription">远程操作、播放媒体或排查问题时再查看实时画面</small></span><i aria-hidden="true">+</i></summary>
+        <div class="inspection-content">
+          <article class="screen-card">
+            <div class="card-kicker"><span data-i18n="preview.liveOutput">实时输出</span><span id="connectorName">自动检测</span></div>
+            <div class="screen-preview" id="screenPreview">
+              <div id="liveScenePreview" class="scene-preview" hidden></div>
+              <img id="liveMediaPreview" class="live-media-preview" alt="当前 HDMI 媒体画面" data-i18n-alt="preview.mediaFrame" hidden>
+              <div class="preview-grid"></div>
+              <div class="preview-status"><span id="previewMode">系统仪表盘</span><strong id="previewClock">--:--</strong><small id="previewTitle">Zima Display</small></div>
+              <div class="screen-foot"><span id="displayState">等待显示器</span><span id="displayMode">首选分辨率</span></div>
+            </div>
+          </article>
+        </div>
+      </details>
+
+      <details class="secondary-tools reveal delay-4">
+        <summary><span><b data-i18n="home.integrationHeading">智能体与扩展</b><small data-i18n="home.integrationDescription">仅在需要 DeepSeek Harness 投屏能力时设置</small></span><i aria-hidden="true">+</i></summary>
+        <section class="integration-panel">
+          <div class="integration-copy"><span data-i18n="dsh.kicker">智能体集成</span><h2 data-i18n="dsh.heading">DeepSeek Harness</h2><p data-i18n="dsh.description">自动发现 ZimaOS 商店版 DSH，并安装持久化投屏 Skill。无需进入容器。</p></div>
+          <div class="integration-status"><span class="integration-dot" aria-hidden="true"></span><strong id="dshState" data-i18n="dsh.checking">正在检查 DSH...</strong></div>
+          <button id="dshInstallButton" class="button primary" type="button" disabled data-i18n="dsh.install">一键安装 Skill</button>
+        </section>
+      </details>
     </main>
 
-    <dialog id="settingsDialog" class="settings-dialog">
+    <dialog id="settingsDialog" class="settings-dialog" aria-labelledby="settingsHeading">
       <form id="settingsForm" method="dialog">
-        <div class="dialog-heading"><div><span data-i18n="settings.kicker">设备策略</span><h2 data-i18n="settings.heading">显示设置</h2></div><button id="closeSettingsButton" class="icon-button" type="button" aria-label="关闭" data-i18n-aria-label="common.close">&times;</button></div>
-        <label><span data-i18n="settings.defaultMode">开机默认模式</span><select id="defaultModeInput"><option value="dashboard" data-i18n="modes.dashboard">系统仪表盘</option><option value="canvas" data-i18n="modes.canvas">自由画布</option><option value="clock" data-i18n="modes.clock">环境时钟</option><option value="black" data-i18n="modes.black">黑屏待机</option><option value="terminal" data-i18n="modes.systemTerminal">系统终端</option></select></label>
-        <label><span data-i18n="settings.backend">显示后端</span><select id="backendInput"><option value="auto" data-i18n="settings.backendAuto">自动：Wayland / DRM 回退</option><option value="wayland" data-i18n="settings.backendWayland">仅 Wayland</option><option value="drm" data-i18n="settings.backendDrm">仅 DRM</option></select></label>
-        <label><span data-i18n="settings.audioDevice">HDMI 音频设备</span><input id="audioDeviceInput" type="text" placeholder="auto"></label>
-        <label><span data-i18n="settings.dashboardLanguage">显示语言</span><select id="dashboardLanguageInput"><option value="zh-CN">简体中文</option><option value="en-US">English</option></select></label>
-        <label><span data-i18n="settings.dashboardTitle">仪表盘标题</span><input id="dashboardTitleInput" type="text" maxlength="64"></label>
-        <label><span data-i18n="settings.dashboardLayout">仪表盘布局</span><select id="dashboardLayoutInput"><option value="auto" data-i18n="settings.layoutAuto">自动适配</option><option value="standard" data-i18n="settings.layoutStandard">标准布局</option><option value="large" data-i18n="settings.layoutLarge">大字布局</option></select></label>
-        <label><span><span data-i18n="settings.fontScale">字体大小</span> <output id="fontScaleValue">100%</output></span><input id="fontScaleInput" type="range" min="80" max="200" step="5" value="100"><small data-i18n="settings.fontScaleHint">大字号会自动降低超大数字的缩放幅度，避免内容互相遮挡。</small></label>
-        <section class="dashboard-preview-panel">
-          <div class="preview-toolbar"><div><b data-i18n="settings.previewHeading">仪表盘预览</b><small data-i18n="settings.previewHint">使用与 HDMI 相同的场景数据和坐标。</small></div><select id="previewResolutionInput" aria-label="预览分辨率" data-i18n-aria-label="settings.previewResolution"><option value="current" data-i18n="settings.previewCurrent">当前显示器</option><option value="1024x600">1024 × 600</option><option value="1280x720">1280 × 720</option><option value="1920x1080">1920 × 1080</option><option value="3840x2160">3840 × 2160</option></select></div>
-          <div id="settingsScenePreview" class="scene-preview settings-scene-preview"></div>
-        </section>
-        <label><span data-i18n="settings.mediaRoots">媒体目录</span><textarea id="mediaRootsInput" rows="4" spellcheck="false"></textarea><small data-i18n="settings.mediaRootsHint">每行一个目录，仅允许 /DATA、/media、/mnt 下的路径。</small></label>
-        <label class="toggle-row"><input id="autoStartInput" type="checkbox"><span><b data-i18n="settings.autoStart">开机接管 HDMI</b><small data-i18n="settings.autoStartHint">关闭后开机保留系统终端</small></span></label>
-        <div class="dialog-actions"><button id="resetDashboardButton" class="button ghost action-left" type="button" data-i18n="settings.resetDashboard">恢复仪表盘默认</button><button id="cancelSettingsButton" class="button ghost" type="button" data-i18n="common.cancel">取消</button><button class="button" type="submit" data-i18n="common.save">保存设置</button><button id="applyDashboardButton" class="button primary" type="submit" data-apply-dashboard="true" data-i18n="settings.applyDashboard">保存并应用到 HDMI</button></div>
+        <header class="settings-header">
+          <div>
+            <span class="settings-kicker" data-i18n="settings.kicker">设备设置</span>
+            <h2 id="settingsHeading" data-i18n="settings.heading">设置</h2>
+            <p data-i18n="settings.subtitle">管理开机行为、显示输出、媒体播放和远程数据。</p>
+          </div>
+          <div class="settings-header-actions">
+            <span id="settingsDirtyBadge" class="settings-dirty-badge" hidden data-i18n="settings.unsaved">有未保存的更改</span>
+            <button id="closeSettingsButton" class="icon-button" type="button" aria-label="关闭" data-i18n-aria-label="common.close">&times;</button>
+          </div>
+        </header>
+
+        <div class="settings-shell">
+          <div class="settings-flow">
+            <section class="device-snapshot" aria-label="当前设备" data-i18n-aria-label="settings.deviceNow">
+              <div><span data-i18n="settings.deviceNow">当前屏幕</span><strong id="settingsDeviceState">--</strong></div>
+              <dl>
+                <div><dt data-i18n="settings.connector">接口</dt><dd id="settingsConnector">--</dd></div>
+                <div><dt data-i18n="settings.currentMode">正在显示</dt><dd id="settingsCurrentMode">--</dd></div>
+              </dl>
+            </section>
+
+            <section id="settingsGeneralPanel" class="settings-panel settings-primary-task">
+              <div class="settings-section-heading"><span>01 / STARTUP</span><h3 data-i18n="settings.generalHeading">开机行为</h3><p data-i18n="settings.generalDescription">设置设备重启后的 HDMI 行为；修改默认画面不会立即切换当前内容。</p></div>
+              <article class="settings-card startup-card">
+                <label class="settings-field startup-mode-field"><span data-i18n="settings.defaultMode">默认画面</span><select id="defaultModeInput"><optgroup data-i18n-label="settings.defaultContentGroup" label="常用画面"><option value="dashboard" data-i18n="modes.dashboard">系统仪表盘</option><option value="canvas" data-i18n="modes.canvas">自由画布</option><option value="clock" data-i18n="modes.clock">环境时钟</option></optgroup><optgroup data-i18n-label="settings.defaultMaintenanceGroup" label="特殊启动"><option value="black" data-i18n="modes.black">黑屏待机</option><option value="terminal" data-i18n="modes.systemTerminal">系统终端</option></optgroup></select><small data-i18n="settings.defaultModeHint">仅在开启“开机自动显示”时使用；保存不会立即切换当前内容。</small></label>
+                <label class="settings-toggle-card">
+                  <input id="autoStartInput" type="checkbox">
+                  <span class="toggle-track" aria-hidden="true"><i></i></span>
+                  <span><b data-i18n="settings.autoStart">开机自动显示</b><small data-i18n="settings.autoStartHint">关闭后，设备开机时保留系统终端</small></span>
+                </label>
+              </article>
+            </section>
+
+            <div id="settingsAdvancedPanel" class="settings-disclosures">
+              <details class="settings-disclosure">
+                <summary><span><b data-i18n="settings.troubleshootingHeading">显示输出</b><small data-i18n="settings.troubleshootingDescription">HDMI 输出方式、分辨率和音频设备</small></span><i aria-hidden="true">+</i></summary>
+                <div class="settings-disclosure-content">
+                  <p class="settings-recommendation" data-i18n="settings.sidebarNote">推荐保持 DRM、自动分辨率和自动音频。只有遇到兼容问题时再修改。</p>
+                  <fieldset class="renderer-options">
+                    <legend data-i18n="settings.backend">显示后端</legend>
+                    <label class="renderer-option"><input type="radio" name="rendererBackend" value="drm"><span><b data-i18n="settings.backendDrm">仅 DRM</b><em data-i18n="settings.recommended">推荐</em><small data-i18n="settings.backendDrmDescription">直接输出到 HDMI，启动链路最短，适合 Intel / AMD 设备。</small></span></label>
+                    <label class="renderer-option"><input type="radio" name="rendererBackend" value="auto"><span><b data-i18n="settings.backendAuto">自动：Wayland / DRM 回退</b><small data-i18n="settings.backendAutoDescription">先尝试 Wayland，再回退到 DRM；启动时间可能更长。</small></span></label>
+                    <label class="renderer-option"><input type="radio" name="rendererBackend" value="wayland"><span><b data-i18n="settings.backendWayland">仅 Wayland</b><em class="muted-tag" data-i18n="settings.advanced">高级</em><small data-i18n="settings.backendWaylandDescription">只在已确认 Weston / Wayland 可用时选择。</small></span></label>
+                  </fieldset>
+                  <div class="advanced-field-grid">
+                    <label class="settings-field"><span data-i18n="settings.resolution">输出分辨率</span><select id="resolutionInput"></select><small data-i18n="settings.resolutionHint">自动会采用显示器报告的首选模式。</small></label>
+                    <label class="settings-field"><span data-i18n="settings.audioDevice">HDMI 音频设备</span><input id="audioDeviceInput" type="text" placeholder="auto"><small data-i18n="settings.audioDeviceHint">保持 auto；只有排查无声问题时填写 mpv 音频设备名。</small></label>
+                  </div>
+                  <div class="settings-impact"><b data-i18n="settings.restartRequired">这些修改需要重启显示</b><span data-i18n="settings.restartRequiredHint">保存不会打断当前画面，将在下次显示服务启动时生效。</span></div>
+                </div>
+              </details>
+              <details class="settings-disclosure">
+                <summary><span><b data-i18n="settings.mediaHeading">媒体播放</b><small data-i18n="settings.mediaDescription">播放结束行为、图片轮播和可访问目录</small></span><i aria-hidden="true">+</i></summary>
+                <div class="settings-disclosure-content media-settings">
+                  <div class="media-settings-grid">
+                    <label class="settings-field"><span data-i18n="settings.singleVideoEnd">单个视频播放结束</span><select id="singleVideoEndInput"><option value="repeat" data-i18n="settings.singleVideoRepeat">重新播放</option><option value="stop" data-i18n="settings.singleVideoStop">停在结束位置</option></select><small data-i18n="settings.singleVideoEndHint">播放单个视频文件时使用。</small></label>
+                    <label class="settings-field"><span data-i18n="settings.collectionEnd">目录或播放列表结束</span><select id="collectionEndInput"><option value="repeat" data-i18n="settings.collectionRepeat">从第一项重新开始</option><option value="stop" data-i18n="settings.collectionStop">播放完最后一项后停止</option></select><small data-i18n="settings.collectionEndHint">适用于多选文件和图片目录轮播。</small></label>
+                    <label class="settings-field"><span data-i18n="settings.slideshowInterval">图片轮播默认停留</span><select id="slideshowIntervalInput"><option value="3">3s</option><option value="5">5s</option><option value="8">8s</option><option value="10">10s</option><option value="15">15s</option><option value="30">30s</option></select><small data-i18n="settings.slideshowIntervalHint">媒体页可以为本次播放临时调整。</small></label>
+                  </div>
+                  <div class="media-roots-block">
+                    <div><b data-i18n="settings.mediaRoots">媒体目录</b><small data-i18n="settings.mediaRootsDescription">控制文件浏览器可以访问的范围</small></div>
+                    <label class="settings-field"><textarea id="mediaRootsInput" rows="4" spellcheck="false" aria-label="媒体目录" data-i18n-aria-label="settings.mediaRoots"></textarea><small data-i18n="settings.mediaRootsHint">每行一个目录，仅允许 /DATA、/media、/mnt 下的路径。</small></label>
+                  </div>
+                </div>
+              </details>
+              <details class="settings-disclosure">
+                <summary><span><b data-i18n="settings.sourcesHeading">远程设备数据</b><small data-i18n="settings.sourcesDescription">通过 SSH 为自由画布提供 CPU、内存、网络等数据</small></span><i aria-hidden="true">+</i></summary>
+                <div class="settings-disclosure-content remote-sources-settings">
+                  <div id="remoteSourcesList" class="remote-sources-list"></div>
+                  <div class="remote-source-form">
+                    <label class="settings-field"><span data-i18n="settings.sourceName">设备名称</span><input id="sourceNameInput" type="text" placeholder="NAS 01"></label>
+                    <label class="settings-field"><span data-i18n="settings.sourceHost">IP / 主机名</span><input id="sourceHostInput" type="text" placeholder="10.0.0.20"></label>
+                    <label class="settings-field"><span data-i18n="settings.sourcePort">SSH 端口</span><input id="sourcePortInput" type="number" min="1" max="65535" value="22"></label>
+                    <label class="settings-field"><span data-i18n="settings.sourceUser">SSH 用户</span><input id="sourceUserInput" type="text" placeholder="casaos"></label>
+                    <label class="settings-field"><span data-i18n="settings.sourcePassword">SSH 密码</span><input id="sourcePasswordInput" type="password" autocomplete="new-password"></label>
+                    <button id="addRemoteSourceButton" class="button dark" type="button" data-i18n="settings.sourceAdd">测试连接并添加</button>
+                  </div>
+                  <p class="settings-recommendation" data-i18n="settings.sourceSecurity">密码仅保存在设备本机的受限文件中，不会返回到浏览器。首次连接会记录 SSH 主机指纹。</p>
+                </div>
+              </details>
+              <details class="settings-disclosure">
+                <summary><span><b data-i18n="settings.maintenanceHeading">屏幕维护</b><small data-i18n="settings.maintenanceDescription">仅在暂停输出或恢复系统终端时使用</small></span><i aria-hidden="true">+</i></summary>
+                <div class="settings-disclosure-content maintenance-actions">
+                  <button class="mode-button maintenance-button" type="button" data-mode="black"><span><b data-i18n="modes.black">黑屏待机</b><small data-i18n="modes.blackHint">播放器保持在线</small></span></button>
+                  <button class="mode-button maintenance-button" type="button" data-mode="terminal"><span><b data-i18n="modes.terminal">恢复终端</b><small data-i18n="modes.terminalHint">释放 HDMI 与 TTY1</small></span></button>
+                </div>
+              </details>
+            </div>
+
+            <section class="settings-about" aria-labelledby="settingsAboutHeading">
+              <div><span data-i18n="settings.aboutKicker">关于</span><h3 id="settingsAboutHeading" data-i18n="settings.aboutHeading">Zima Display</h3><p data-i18n="settings.aboutDescription">查看当前版本、源代码和问题反馈入口。</p></div>
+              <dl><div><dt data-i18n="settings.version">版本</dt><dd id="appVersion">--</dd></div><div><dt>GitHub</dt><dd><a href="https://github.com/LinkLeong/zima-display" target="_blank" rel="noreferrer">LinkLeong/zima-display</a></dd></div></dl>
+            </section>
+          </div>
+        </div>
+
+        <footer class="dialog-actions settings-actions">
+          <div><b id="settingsSaveState" data-i18n="settings.noChanges">没有待保存的修改</b><small data-i18n="settings.applyHint">保存不会切换当前内容；输出方式和分辨率在下次重启显示时生效。</small></div>
+          <button id="cancelSettingsButton" class="button ghost" type="button" data-i18n="common.cancel">取消</button>
+          <button id="applySettingsButton" class="button primary" type="submit" data-i18n="settings.applyDisplay">保存设置</button>
+        </footer>
       </form>
     </dialog>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script src="app.js?v=0.4.2"></script>
+    <script src="app.js?v=0.4.3"></script>
   </body>
 </html>

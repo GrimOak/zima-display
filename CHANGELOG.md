@@ -4,6 +4,27 @@ All notable changes to this project are documented in this file. The project fol
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-10-21
+
+### Added
+
+- Added SSH-based CPU, memory, storage, network, temperature and identity metrics from remote Linux devices for free-canvas widgets.
+- Added persistent media playback defaults for single-video completion, playlist/directory completion and slideshow timing.
+- Added an actual mpv frame capture for the on-demand current-screen preview during video, slideshow and presentation playback.
+- Added layered release gates, package verification, renderer fallback tests and physical-device acceptance procedures.
+
+### Fixed
+
+- Fell back to software DRM rendering for the rest of the boot when the GPU DRM renderer exits or cannot create its mpv IPC socket.
+- Replaced the generic clock placeholder shown during media playback with the frame currently rendered on HDMI.
+
+### Changed
+
+- Reorganized the home page into guided, mutually exclusive Ready-made, Free canvas and Media workflows.
+- Moved dashboard appearance editing beside the Ready-made workspace and reduced Settings to persistent device behavior.
+- Reorganized Settings around startup behavior, display output, media playback, remote data sources and screen maintenance.
+- Made direct DRM the default renderer for new installations while retaining Auto and Wayland compatibility options.
+
 ## [0.4.2] - 2026-09-21
 
 ### Added

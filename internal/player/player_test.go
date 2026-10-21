@@ -299,7 +299,7 @@ func TestMediaPlaybackAndSlideshowConfigureInfiniteLoops(t *testing.T) {
 	}
 	want := [][]any{
 		{"get_property", "idle-active"},
-		{"set_property", "loop-playlist", "inf"},
+		{"set_property", "loop-playlist", "no"},
 		{"set_property", "loop-file", "inf"},
 		{"set_property", "image-display-duration", "inf"},
 		{"loadfile", "/DATA/demo.mp4", "replace"},
@@ -345,10 +345,159 @@ func TestMediaPlaybackAndSlideshowConfigureInfiniteLoops(t *testing.T) {
 	}
 }
 
+func TestMediaPlaybackHonorsConfiguredEndBehavior(t *testing.T) {
+	directory, err := os.MkdirTemp("/tmp", "zd-media-policy-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(directory) })
+	socketPath := filepath.Join(directory, "mpv.sock")
+	listener, err := net.Listen("unix", socketPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = listener.Close() })
+
+	requests := make(chan []any, 32)
+	go func() {
+		for {
+			connection, acceptErr := listener.Accept()
+			if acceptErr != nil {
+				return
+			}
+			var request struct {
+				Command   []any `json:"command"`
+				RequestID int64 `json:"request_id"`
+			}
+			if json.NewDecoder(connection).Decode(&request) == nil {
+				requests <- request.Command
+				_ = json.NewEncoder(connection).Encode(map[string]any{"error": "success", "request_id": request.RequestID})
+			}
+			_ = connection.Close()
+		}
+	}()
+
+	cfg := config.Default()
+	cfg.Media.SingleVideoEnd = "stop"
+	manager := New(socketPath, directory, func() config.Config { return cfg })
+	manager.runner = readyRunner{}
+	if err := manager.Play(context.Background(), []string{"/DATA/one.mp4"}); err != nil {
+		t.Fatal(err)
+	}
+	expectMPVCommands(t, requests, [][]any{
+		{"get_property", "idle-active"},
+		{"set_property", "loop-playlist", "no"},
+		{"set_property", "loop-file", "no"},
+		{"set_property", "image-display-duration", "inf"},
+		{"loadfile", "/DATA/one.mp4", "replace"},
+		{"set_property", "pause", false},
+	})
+
+	if err := manager.Play(context.Background(), []string{"/DATA/one.mp4", "/DATA/two.mp4"}); err != nil {
+		t.Fatal(err)
+	}
+	expectMPVCommands(t, requests, [][]any{
+		{"get_property", "idle-active"},
+		{"set_property", "loop-playlist", "inf"},
+		{"set_property", "loop-file", "no"},
+		{"set_property", "image-display-duration", "inf"},
+		{"loadfile", "/DATA/one.mp4", "replace"},
+		{"loadfile", "/DATA/two.mp4", "append-play"},
+		{"set_property", "pause", false},
+	})
+
+	cfg.Media.CollectionEnd = "stop"
+	if err := manager.Slideshow(context.Background(), []string{"/DATA/one.jpg", "/DATA/two.jpg"}, 15); err != nil {
+		t.Fatal(err)
+	}
+	expectMPVCommands(t, requests, [][]any{
+		{"get_property", "idle-active"},
+		{"set_property", "loop-playlist", "no"},
+		{"set_property", "loop-file", "no"},
+		{"set_property", "image-display-duration", float64(15)},
+		{"loadfile", "/DATA/one.jpg", "replace"},
+		{"loadfile", "/DATA/two.jpg", "append-play"},
+		{"set_property", "pause", false},
+	})
+}
+
+func expectMPVCommands(t *testing.T, requests <-chan []any, want [][]any) {
+	t.Helper()
+	for index := range want {
+		select {
+		case got := <-requests:
+			if !reflect.DeepEqual(got, want[index]) {
+				t.Fatalf("request %d: got %#v want %#v", index, got, want[index])
+			}
+		case <-time.After(time.Second):
+			t.Fatalf("timed out waiting for request %d", index)
+		}
+	}
+}
+
 func TestSlideshowRejectsUnsafeDuration(t *testing.T) {
 	manager := New(filepath.Join(t.TempDir(), "missing.sock"), t.TempDir(), config.Default)
 	if err := manager.Slideshow(context.Background(), []string{"/DATA/demo.jpg"}, 0.5); err == nil {
 		t.Fatal("expected an unsafe slideshow duration to fail")
+	}
+}
+
+func TestCaptureFrameUsesCurrentMPVOutput(t *testing.T) {
+	directory, err := os.MkdirTemp("/tmp", "zd-capture-frame-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(directory) })
+	socketPath := filepath.Join(directory, "mpv.sock")
+	listener, err := net.Listen("unix", socketPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = listener.Close() })
+	commands := make(chan []any, 1)
+	serverErrors := make(chan error, 1)
+	go func() {
+		connection, acceptErr := listener.Accept()
+		if acceptErr != nil {
+			serverErrors <- acceptErr
+			return
+		}
+		defer connection.Close()
+		var request struct {
+			Command   []any `json:"command"`
+			RequestID int64 `json:"request_id"`
+		}
+		if decodeErr := json.NewDecoder(connection).Decode(&request); decodeErr != nil {
+			serverErrors <- decodeErr
+			return
+		}
+		path, _ := request.Command[1].(string)
+		if writeErr := os.WriteFile(path, []byte{0xff, 0xd8, 0xff, 0xd9}, 0o600); writeErr != nil {
+			serverErrors <- writeErr
+			return
+		}
+		commands <- request.Command
+		serverErrors <- json.NewEncoder(connection).Encode(map[string]any{"error": "success", "request_id": request.RequestID})
+	}()
+
+	manager := New(socketPath, directory, config.Default)
+	frame, err := manager.CaptureFrame(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(frame, []byte{0xff, 0xd8, 0xff, 0xd9}) {
+		t.Fatalf("captured frame = %v", frame)
+	}
+	command := <-commands
+	if len(command) != 3 || command[0] != "screenshot-to-file" || command[2] != "subtitles" {
+		t.Fatalf("unexpected screenshot command %#v", command)
+	}
+	if err := <-serverErrors; err != nil {
+		t.Fatal(err)
+	}
+	path, _ := command[1].(string)
+	if _, err := os.Stat(path); !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("temporary screenshot was not removed: %v", err)
 	}
 }
 

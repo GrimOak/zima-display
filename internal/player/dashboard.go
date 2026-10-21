@@ -11,8 +11,12 @@ import (
 )
 
 func renderMode(mode string, snapshot metrics.Snapshot, cfg config.Config, now time.Time) string {
+	return renderModeWithSources(mode, snapshot, nil, cfg, now)
+}
+
+func renderModeWithSources(mode string, snapshot metrics.Snapshot, sources map[string]metrics.Snapshot, cfg config.Config, now time.Time) string {
 	if mode == "canvas" {
-		return RenderSceneASS(CanvasScene(snapshot, cfg, now))
+		return RenderSceneASS(CanvasSceneWithSources(snapshot, sources, cfg, now))
 	}
 	if mode == "clock" {
 		return renderClock(now, dashboardLocale(cfg), cfg.Dashboard.FontScale)

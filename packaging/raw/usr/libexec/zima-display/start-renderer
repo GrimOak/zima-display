@@ -1,11 +1,17 @@
 #!/bin/sh
 set -eu
 
-RUNTIME_DIR=/run/zima-display
-DATA_DIR=/DATA/AppData/zima-display
+RUNTIME_DIR=${ZIMA_DISPLAY_RUNTIME_DIR:-/run/zima-display}
+DATA_DIR=${ZIMA_DISPLAY_DATA_DIR:-/DATA/AppData/zima-display}
+DRM_DIR=${ZIMA_DISPLAY_DRM_DIR:-/sys/class/drm}
 ENV_FILE="$RUNTIME_DIR/renderer.env"
 SOCKET="$RUNTIME_DIR/mpv.sock"
 LOG_DIR="$DATA_DIR/logs"
+SOFTWARE_FALLBACK_MARKER="$RUNTIME_DIR/software-renderer"
+GPU_ATTEMPT_MARKER="$RUNTIME_DIR/gpu-drm-attempted"
+MPV_BIN=${ZIMA_DISPLAY_MPV_BIN:-mpv}
+WESTON_BIN=${ZIMA_DISPLAY_WESTON_BIN:-weston}
+MAX_RENDER_CYCLES=${ZIMA_DISPLAY_TEST_MAX_RENDER_CYCLES:-0}
 
 mkdir -p "$RUNTIME_DIR" "$LOG_DIR" "$DATA_DIR/runtime"
 chmod 0700 "$RUNTIME_DIR"
@@ -35,6 +41,8 @@ set -- \
     --input-ipc-server="$SOCKET" \
     --hwdec=auto-safe \
     --image-display-duration=inf \
+    --screenshot-format=jpg \
+    --screenshot-jpeg-quality=72 \
     --volume="$ZIMA_DISPLAY_VOLUME"
 
 if [ "$ZIMA_DISPLAY_AUDIO_DEVICE" != auto ]; then
@@ -45,36 +53,85 @@ if [ "$ZIMA_DISPLAY_RESOLUTION" != auto ]; then
 fi
 
 WESTON_PID=
+MPV_PID=
 cleanup() {
+    if [ -n "$MPV_PID" ]; then
+        kill "$MPV_PID" 2>/dev/null || true
+        wait "$MPV_PID" 2>/dev/null || true
+        MPV_PID=
+    fi
     if [ -n "$WESTON_PID" ]; then
         kill "$WESTON_PID" 2>/dev/null || true
         wait "$WESTON_PID" 2>/dev/null || true
+        WESTON_PID=
     fi
 }
 trap cleanup EXIT
 trap 'exit 0' INT TERM
 
+log() {
+    echo "zima-display-renderer: $*" >&2
+}
+
 display_connected() {
-    for status_file in /sys/class/drm/card*-*/status; do
+    for status_file in "$DRM_DIR"/card*-*/status; do
         [ -f "$status_file" ] || continue
         [ "$(cat "$status_file" 2>/dev/null || true)" = connected ] && return 0
     done
     return 1
 }
 
+run_mpv() {
+    rm -f "$SOCKET"
+    "$MPV_BIN" "$@" &
+    MPV_PID=$!
+    wait_count=0
+    while [ "$wait_count" -lt 40 ]; do
+        if [ -S "$SOCKET" ]; then
+            if wait "$MPV_PID"; then
+                result=0
+            else
+                result=$?
+            fi
+            MPV_PID=
+            return "$result"
+        fi
+        if ! kill -0 "$MPV_PID" 2>/dev/null; then
+            if wait "$MPV_PID"; then
+                result=0
+            else
+                result=$?
+            fi
+            MPV_PID=
+            log "mpv exited before binding $SOCKET"
+            [ "$result" -ne 0 ] && return "$result"
+            return 1
+        fi
+        wait_count=$((wait_count + 1))
+        sleep 0.25
+    done
+    kill "$MPV_PID" 2>/dev/null || true
+    wait "$MPV_PID" 2>/dev/null || true
+    MPV_PID=
+    log "mpv did not bind $SOCKET within 10 seconds"
+    return 1
+}
+
 start_wayland() {
-    command -v weston >/dev/null 2>&1 || return 1
+    command -v "$WESTON_BIN" >/dev/null 2>&1 || return 1
     rm -f "$RUNTIME_DIR"/wayland-*
-    weston --backend=drm-backend.so --tty=1 --idle-time=0 --log="$LOG_DIR/weston.log" &
+    "$WESTON_BIN" --backend=drm-backend.so --tty=1 --idle-time=0 --log="$LOG_DIR/weston.log" &
     WESTON_PID=$!
     count=0
     while [ "$count" -lt 40 ]; do
         if [ -S "$RUNTIME_DIR/wayland-0" ]; then
             export WAYLAND_DISPLAY=wayland-0
-            mpv "$@" --vo=gpu-next --gpu-context=wayland
-            result=$?
+            if run_mpv "$@" --vo=gpu-next --gpu-context=wayland; then
+                result=0
+            else
+                result=$?
+            fi
             cleanup
-            WESTON_PID=
             return "$result"
         fi
         if ! kill -0 "$WESTON_PID" 2>/dev/null; then
@@ -86,6 +143,27 @@ start_wayland() {
     return 1
 }
 
+start_drm() {
+    if [ ! -e "$SOFTWARE_FALLBACK_MARKER" ] && [ ! -e "$GPU_ATTEMPT_MARKER" ]; then
+        : > "$GPU_ATTEMPT_MARKER"
+        log "trying the GPU DRM renderer"
+        if run_mpv "$@" --vo=gpu-next --gpu-context=drm; then
+            result=0
+        else
+            result=$?
+        fi
+        log "GPU DRM renderer exited with status $result; using software DRM until the next boot"
+        : > "$SOFTWARE_FALLBACK_MARKER"
+    elif [ ! -e "$SOFTWARE_FALLBACK_MARKER" ]; then
+        log "GPU DRM was already attempted this boot; using software DRM"
+        : > "$SOFTWARE_FALLBACK_MARKER"
+    fi
+
+    log "starting software DRM renderer"
+    run_mpv "$@" --vo=drm --hwdec=no
+}
+
+render_cycles=0
 while :; do
     while ! display_connected; do
         sleep 2
@@ -106,6 +184,10 @@ while :; do
         WESTON_PID=
     fi
 
-    mpv "$@" --vo=gpu-next --gpu-context=drm || true
+    start_drm "$@" || true
+    render_cycles=$((render_cycles + 1))
+    if [ "$MAX_RENDER_CYCLES" -gt 0 ] && [ "$render_cycles" -ge "$MAX_RENDER_CYCLES" ]; then
+        exit 0
+    fi
     sleep 2
 done

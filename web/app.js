@@ -6,7 +6,20 @@ const translations = {
     'language.synced': 'Web 和 HDMI 已切换为简体中文',
     'status.connecting': '服务连接中', 'status.online': '服务在线', 'status.offline': '服务离线',
     'settings.open': '打开设置',
+    'home.kicker': '开始使用', 'home.heading': '你想让屏幕显示什么？',
+    'home.description': '先选择一种内容。页面只会展开完成这件事需要的工具。',
+    'home.viewCurrent': '查看当前屏幕', 'home.chooseHeading': '选择内容类型',
+    'home.chooseDescription': '三种方式互不干扰，一次只处理一种。',
+    'home.choiceDashboard': '使用现成画面', 'home.choiceDashboardHint': '直接显示系统状态或时钟',
+    'home.choiceCanvas': '设计自由画布', 'home.choiceCanvasHint': '从模板开始，再调整组件和背景',
+    'home.choiceMedia': '播放照片或视频', 'home.choiceMediaHint': '选择文件、文件夹或网络地址',
+    'home.presetHeading': '选择一个现成画面', 'home.presetDescription': '适合第一次使用，点击后立即显示到 HDMI。',
+    'home.showNow': '立即显示', 'home.currentOutputHeading': '需要确认屏幕吗？',
+    'home.currentOutputDescription': '远程操作、播放媒体或排查问题时再查看实时画面',
+    'home.screenTools': '屏幕维护', 'home.screenToolsHint': '这些不是内容类型，只在暂停显示或恢复终端时使用。',
+    'home.integrationHeading': '智能体与扩展', 'home.integrationDescription': '仅在需要 DeepSeek Harness 投屏能力时设置',
     'preview.liveOutput': '实时输出', 'preview.autoDetect': '自动检测',
+    'preview.mediaFrame': '当前 HDMI 媒体画面',
     'preview.hdmiOnline': 'HDMI 已连接', 'preview.waitingDisplay': '等待显示器连接',
     'preview.preferredMode': '首选分辨率',
     'player.nowPlaying': '当前内容', 'player.managed': 'HDMI 输出由 Zima Display 管理',
@@ -29,16 +42,21 @@ const translations = {
     'metrics.memory': '内存', 'metrics.storage': '存储', 'metrics.network': '网络',
     'metrics.thermal': '温度 / GPU', 'metrics.waitingNetwork': '等待网络',
     'metrics.autoGraphics': '自动检测图形设备',
+    'dashboard.editorKicker': '仪表盘编辑', 'dashboard.editorHeading': '调整系统仪表盘',
+    'dashboard.editorDescription': '修改标题、布局和字号。保存前只影响这里的预览。',
+    'dashboard.save': '保存设置', 'dashboard.apply': '保存并投到 HDMI',
+    'dashboard.saved': '仪表盘设置已保存', 'dashboard.applied': '仪表盘设置已保存并投到 HDMI',
     'canvas.kicker': '布局工作室', 'canvas.heading': '自由画布',
-    'canvas.description': '拖动组件调整位置，拖动右下角改变大小。保存前不会改变 HDMI。',
+    'canvas.description': '先选模板，再拖动组件调整。保存前不会改变 HDMI。',
     'canvas.save': '保存布局', 'canvas.apply': '保存并投到 HDMI',
+    'canvas.templateHeading': '从模板开始', 'canvas.templateDescription': '模板只提供起点，应用后仍可自由修改。',
     'canvas.template': '布局模板', 'canvas.templateOverview': '系统概览',
     'canvas.templateClock': '巨型时钟', 'canvas.templateMinimal': '极简状态',
     'canvas.useTemplate': '应用模板', 'canvas.backgroundType': '背景类型',
     'canvas.backgroundSolid': '纯色', 'canvas.backgroundGradient': '渐变', 'canvas.backgroundImage': '图片',
     'canvas.primaryColor': '主色', 'canvas.secondaryColor': '辅色', 'canvas.backgroundPath': '背景图片',
     'canvas.uploadBackground': '上传背景图片', 'canvas.addWidget': '添加组件',
-    'canvas.inspector': '所选组件', 'canvas.text': '文字', 'canvas.fontSize': '字号',
+    'canvas.inspector': '所选组件', 'canvas.text': '文字', 'canvas.source': '数据来源', 'canvas.sourceHint': '本机或设置中添加的远程设备', 'canvas.sourceLocal': '本机', 'canvas.fontSize': '字号',
     'canvas.textColor': '文字颜色', 'canvas.bold': '粗体', 'canvas.removeWidget': '删除组件',
     'canvas.savedState': '已保存', 'canvas.unsavedState': '未保存', 'canvas.saved': '自由画布已保存',
     'canvas.applied': '自由画布已保存并投到 HDMI', 'canvas.selectWidget': '请先选择一个组件',
@@ -46,7 +64,8 @@ const translations = {
     'canvas.widget.memory': '内存', 'canvas.widget.storage': '存储', 'canvas.widget.temperature': '温度',
     'canvas.widget.network': '网络速率', 'canvas.widget.ip': 'IP 地址',
     'canvas.widget.hostname': '主机名', 'canvas.widget.text': '自定义文字',
-    'media.kicker': '媒体控制台', 'media.heading': '媒体与播放队列',
+    'media.kicker': '媒体播放', 'media.heading': '选择要播放的内容',
+    'media.description': '选择文件后播放；这里不会同时显示自由画布工具。',
     'media.upload': '上传媒体', 'media.uploads': '上传媒体', 'media.playSelected': '播放已选',
     'media.networkMedia': '网络媒体', 'media.urlPlaceholder': 'https://... 或 rtsp://...',
     'media.playNow': '立即播放', 'media.parent': '返回上级', 'media.root': '媒体根目录',
@@ -68,23 +87,66 @@ const translations = {
     'dsh.install': '一键安装 Skill', 'dsh.update': '更新 Skill',
     'dsh.installing': '正在安装 DSH Skill...', 'dsh.completed': 'DSH Skill 安装完成，刷新 DSH 页面即可使用',
     'dsh.retrying': '检测接口暂不可用，5 秒后自动重试',
-    'settings.kicker': '设备策略', 'settings.heading': '显示设置',
-    'settings.defaultMode': '开机默认模式', 'settings.backend': '显示后端',
+    'settings.kicker': '设备设置', 'settings.heading': '设置',
+    'settings.subtitle': '管理开机行为、显示输出、媒体播放和远程数据。',
+    'settings.deviceNow': '当前输出', 'settings.categories': '设置分类',
+    'settings.connector': '接口', 'settings.currentMode': '正在显示',
+    'settings.deviceConnected': '显示器已连接', 'settings.deviceDisconnected': '等待显示器',
+    'settings.rendererReady': '渲染器在线', 'settings.rendererUnavailable': '渲染器未就绪',
+    'settings.navGeneral': '显示与启动', 'settings.navGeneralHint': '开机内容、输出方式',
+    'settings.navDashboard': '仪表盘外观', 'settings.navDashboardHint': '标题、布局和字号',
+    'settings.navAdvanced': '媒体与高级', 'settings.navAdvancedHint': '目录和音频设备',
+    'settings.sidebarNote': '推荐保持 DRM、自动分辨率和自动音频。只有遇到兼容问题时再修改。',
+    'settings.generalHeading': '开机行为', 'settings.generalDescription': '设置设备重启后的 HDMI 行为；修改默认画面不会立即切换当前内容。',
+    'settings.startupHeading': '开机行为', 'settings.startupDescription': '让设备启动后直接进入常用画面。',
+    'settings.defaultMode': '默认画面', 'settings.defaultModeHint': '仅在开启“开机自动显示”时使用；保存不会立即切换当前内容。',
+    'settings.defaultContentGroup': '常用画面', 'settings.defaultMaintenanceGroup': '特殊启动',
+    'settings.outputHeading': 'HDMI 输出方式', 'settings.outputDescription': 'DRM 是 ZimaOS 设备的首选路径；其他选项用于兼容性排查。',
+    'settings.backend': '显示后端',
     'settings.backendAuto': '自动：Wayland / DRM 回退', 'settings.backendWayland': '仅 Wayland',
-    'settings.backendDrm': '仅 DRM', 'settings.audioDevice': 'HDMI 音频设备',
+    'settings.backendDrm': '仅 DRM', 'settings.backendDrmDescription': '直接输出到 HDMI，启动链路最短，适合 Intel / AMD 设备。',
+    'settings.backendAutoDescription': '先尝试 Wayland，再回退到 DRM；启动时间可能更长。',
+    'settings.backendWaylandDescription': '只在已确认 Weston / Wayland 可用时选择。',
+    'settings.recommended': '推荐', 'settings.advanced': '高级',
+    'settings.resolution': '输出分辨率', 'settings.resolutionAuto': '自动（显示器首选）',
+    'settings.resolutionHint': '自动会采用显示器报告的首选模式。',
+    'settings.restartRequired': '这些修改需要重启显示', 'settings.restartRequiredHint': '保存不会打断当前画面，将在下次显示服务启动时生效。',
+    'settings.audioDevice': 'HDMI 音频设备', 'settings.audioDeviceHint': '保持 auto；只有排查无声问题时填写 mpv 音频设备名。',
+    'settings.audioHeading': 'HDMI 音频', 'settings.audioDescription': '自动模式适合大多数电视和显示器。',
     'settings.dashboardLanguage': '显示语言', 'settings.dashboardTitle': '仪表盘标题',
+    'settings.dashboardTitleHint': '显示在仪表盘左上方。', 'settings.dashboardLanguageHint': '同时作为 Web 控制页的语言。',
     'settings.dashboardLayout': '仪表盘布局', 'settings.layoutAuto': '自动适配',
     'settings.layoutStandard': '标准布局', 'settings.layoutLarge': '大字布局',
+    'settings.dashboardLayoutHint': '自动会根据显示器尺寸选择更易读的布局。',
     'settings.fontScale': '字体大小', 'settings.fontScaleHint': '大字号会自动降低超大数字的缩放幅度，避免内容互相遮挡。',
     'settings.previewHeading': '仪表盘预览', 'settings.previewHint': '使用与 HDMI 相同的场景数据和坐标。',
     'settings.previewResolution': '预览分辨率', 'settings.previewCurrent': '当前显示器',
-    'settings.resetDashboard': '恢复仪表盘默认', 'settings.applyDashboard': '保存并应用到 HDMI',
+    'settings.resetDashboard': '恢复仪表盘默认',
+    'settings.advancedHeading': '媒体与高级', 'settings.advancedDescription': '通常无需修改；错误的路径或设备名会导致媒体不可见或 HDMI 无声。',
+    'settings.troubleshootingHeading': '显示输出', 'settings.troubleshootingDescription': 'HDMI 输出方式、分辨率和音频设备',
+    'settings.mediaHeading': '媒体播放', 'settings.mediaDescription': '播放结束行为、图片轮播和可访问目录',
+    'settings.singleVideoEnd': '单个视频播放结束', 'settings.singleVideoRepeat': '重新播放', 'settings.singleVideoStop': '停在结束位置',
+    'settings.singleVideoEndHint': '播放单个视频文件时使用。',
+    'settings.collectionEnd': '目录或播放列表结束', 'settings.collectionRepeat': '从第一项重新开始', 'settings.collectionStop': '播放完最后一项后停止',
+    'settings.collectionEndHint': '适用于多选文件和图片目录轮播。',
+    'settings.slideshowInterval': '图片轮播默认停留', 'settings.slideshowIntervalHint': '媒体页可以为本次播放临时调整。',
     'settings.mediaRoots': '媒体目录',
+    'settings.mediaRootsDescription': '控制文件浏览器可以访问的范围',
     'settings.mediaRootsHint': '每行一个目录，仅允许 /DATA、/media、/mnt 下的路径。',
-    'settings.autoStart': '开机接管 HDMI', 'settings.autoStartHint': '关闭后开机保留系统终端',
+    'settings.sourcesHeading': '远程设备数据', 'settings.sourcesDescription': '通过 SSH 为自由画布提供 CPU、内存、网络等数据',
+    'settings.sourceName': '设备名称', 'settings.sourceHost': 'IP / 主机名', 'settings.sourcePort': 'SSH 端口', 'settings.sourceUser': 'SSH 用户', 'settings.sourcePassword': 'SSH 密码',
+    'settings.sourceAdd': '测试连接并添加', 'settings.sourceAdding': '正在测试 SSH 并采集数据...', 'settings.sourceAdded': '远程设备已添加', 'settings.sourceRemoved': '远程设备已删除',
+    'settings.sourceSecurity': '密码仅保存在设备本机的受限文件中，不会返回到浏览器。首次连接会记录 SSH 主机指纹。',
+    'settings.sourceEmpty': '还没有远程设备。添加后可在自由画布组件中选择。', 'settings.sourceOnline': '在线', 'settings.sourceOffline': '离线', 'settings.sourceDelete': '删除',
+    'settings.maintenanceHeading': '屏幕维护', 'settings.maintenanceDescription': '仅在暂停输出或恢复系统终端时使用',
+    'settings.autoStart': '开机自动显示', 'settings.autoStartHint': '关闭后，设备开机时保留系统终端',
     'settings.notLoaded': '配置尚未加载',
-    'settings.saved': '设置已保存，显示后端将在下次启动时生效',
-    'settings.applied': '仪表盘设置已保存并应用到 HDMI',
+    'settings.saved': '设置已保存',
+    'settings.applied': '设置已保存',
+    'settings.applyDisplay': '保存设置', 'settings.applyHint': '保存不会切换当前内容；输出方式和分辨率在下次重启显示时生效。',
+    'settings.unsaved': '有未保存的更改', 'settings.noChanges': '没有待保存的修改', 'settings.changesPending': '设置已修改，尚未保存',
+    'settings.aboutKicker': '关于', 'settings.aboutHeading': 'Zima Display',
+    'settings.aboutDescription': '查看当前版本、源代码和问题反馈入口。', 'settings.version': '版本',
     'settings.switched': '已切换到{mode}',
     'common.close': '关闭', 'common.cancel': '取消', 'common.save': '保存设置'
   },
@@ -93,7 +155,20 @@ const translations = {
     'language.synced': 'Web and HDMI switched to English',
     'status.connecting': 'Connecting', 'status.online': 'Service online', 'status.offline': 'Service offline',
     'settings.open': 'Open settings',
+    'home.kicker': 'GET STARTED', 'home.heading': 'What do you want the screen to show?',
+    'home.description': 'Choose one content type first. Only the tools needed for that task will open.',
+    'home.viewCurrent': 'View current screen', 'home.chooseHeading': 'Choose a content type',
+    'home.chooseDescription': 'The three paths stay separate so you can focus on one task at a time.',
+    'home.choiceDashboard': 'Use a ready-made view', 'home.choiceDashboardHint': 'Show system status or a clock immediately',
+    'home.choiceCanvas': 'Design a free canvas', 'home.choiceCanvasHint': 'Start with a template, then adjust widgets and background',
+    'home.choiceMedia': 'Play photos or video', 'home.choiceMediaHint': 'Choose files, a folder or a network address',
+    'home.presetHeading': 'Choose a ready-made view', 'home.presetDescription': 'Best for first use. Click one to show it on HDMI now.',
+    'home.showNow': 'Show now', 'home.currentOutputHeading': 'Need to confirm the screen?',
+    'home.currentOutputDescription': 'Open the live view only for remote operation, media playback or troubleshooting',
+    'home.screenTools': 'Screen maintenance', 'home.screenToolsHint': 'These are not content types. Use them only to pause output or restore the terminal.',
+    'home.integrationHeading': 'Agents and extensions', 'home.integrationDescription': 'Set this up only when you need DeepSeek Harness display support',
     'preview.liveOutput': 'LIVE OUTPUT', 'preview.autoDetect': 'AUTO DETECT',
+    'preview.mediaFrame': 'Current HDMI media frame',
     'preview.hdmiOnline': 'HDMI ONLINE', 'preview.waitingDisplay': 'Waiting for display',
     'preview.preferredMode': 'Preferred mode',
     'player.nowPlaying': 'NOW PLAYING', 'player.managed': 'HDMI output is managed by Zima Display',
@@ -117,16 +192,21 @@ const translations = {
     'metrics.memory': 'MEMORY', 'metrics.storage': 'STORAGE', 'metrics.network': 'NETWORK',
     'metrics.thermal': 'THERMAL / GPU', 'metrics.waitingNetwork': 'Waiting for network',
     'metrics.autoGraphics': 'Automatic graphics detection',
+    'dashboard.editorKicker': 'DASHBOARD EDITOR', 'dashboard.editorHeading': 'Customize the system dashboard',
+    'dashboard.editorDescription': 'Adjust the title, layout and type size. Changes stay in this preview until saved.',
+    'dashboard.save': 'Save settings', 'dashboard.apply': 'Save and show on HDMI',
+    'dashboard.saved': 'Dashboard settings saved', 'dashboard.applied': 'Dashboard settings saved and shown on HDMI',
     'canvas.kicker': 'LAYOUT STUDIO', 'canvas.heading': 'Free canvas',
-    'canvas.description': 'Drag widgets to position them and drag the lower-right corner to resize. HDMI stays unchanged until saved.',
+    'canvas.description': 'Choose a template, then drag widgets to adjust it. HDMI stays unchanged until saved.',
     'canvas.save': 'Save layout', 'canvas.apply': 'Save and show on HDMI',
+    'canvas.templateHeading': 'Start with a template', 'canvas.templateDescription': 'Templates are starting points and remain fully editable.',
     'canvas.template': 'Layout template', 'canvas.templateOverview': 'System overview',
     'canvas.templateClock': 'Giant clock', 'canvas.templateMinimal': 'Minimal status',
     'canvas.useTemplate': 'Apply template', 'canvas.backgroundType': 'Background type',
     'canvas.backgroundSolid': 'Solid', 'canvas.backgroundGradient': 'Gradient', 'canvas.backgroundImage': 'Image',
     'canvas.primaryColor': 'Primary color', 'canvas.secondaryColor': 'Secondary color', 'canvas.backgroundPath': 'Background image',
     'canvas.uploadBackground': 'Upload background image', 'canvas.addWidget': 'Add widget',
-    'canvas.inspector': 'Selected widget', 'canvas.text': 'Text', 'canvas.fontSize': 'Font size',
+    'canvas.inspector': 'Selected widget', 'canvas.text': 'Text', 'canvas.source': 'Data source', 'canvas.sourceHint': 'This device or a remote device added in Settings', 'canvas.sourceLocal': 'This device', 'canvas.fontSize': 'Font size',
     'canvas.textColor': 'Text color', 'canvas.bold': 'Bold', 'canvas.removeWidget': 'Remove widget',
     'canvas.savedState': 'SAVED', 'canvas.unsavedState': 'UNSAVED', 'canvas.saved': 'Free canvas saved',
     'canvas.applied': 'Free canvas saved and shown on HDMI', 'canvas.selectWidget': 'Select a widget first',
@@ -134,7 +214,8 @@ const translations = {
     'canvas.widget.memory': 'Memory', 'canvas.widget.storage': 'Storage', 'canvas.widget.temperature': 'Temperature',
     'canvas.widget.network': 'Network rate', 'canvas.widget.ip': 'IP address',
     'canvas.widget.hostname': 'Hostname', 'canvas.widget.text': 'Custom text',
-    'media.kicker': 'MEDIA DECK', 'media.heading': 'Media and playback queue',
+    'media.kicker': 'MEDIA PLAYBACK', 'media.heading': 'Choose what to play',
+    'media.description': 'Choose media and play it. Canvas editing stays out of this workflow.',
     'media.upload': 'Upload media', 'media.uploads': 'Uploads', 'media.playSelected': 'Play selected',
     'media.networkMedia': 'Network media', 'media.urlPlaceholder': 'https://... or rtsp://...',
     'media.playNow': 'Play now', 'media.parent': 'Go to parent folder', 'media.root': 'Media roots',
@@ -156,24 +237,67 @@ const translations = {
     'dsh.install': 'Install Skill', 'dsh.update': 'Update Skill',
     'dsh.installing': 'Installing the DSH skill...', 'dsh.completed': 'DSH skill installed. Refresh DSH to use it.',
     'dsh.retrying': 'Detection is temporarily unavailable; retrying in 5 seconds',
-    'settings.kicker': 'DEVICE POLICY', 'settings.heading': 'Display settings',
-    'settings.defaultMode': 'Default mode at startup', 'settings.backend': 'Display backend',
+    'settings.kicker': 'DEVICE SETTINGS', 'settings.heading': 'Settings',
+    'settings.subtitle': 'Manage startup behavior, display output, media playback and remote data.',
+    'settings.deviceNow': 'CURRENT OUTPUT', 'settings.categories': 'Settings categories',
+    'settings.connector': 'Connector', 'settings.currentMode': 'Now showing',
+    'settings.deviceConnected': 'Display connected', 'settings.deviceDisconnected': 'Waiting for display',
+    'settings.rendererReady': 'Renderer online', 'settings.rendererUnavailable': 'Renderer unavailable',
+    'settings.navGeneral': 'Display & startup', 'settings.navGeneralHint': 'Startup content and output',
+    'settings.navDashboard': 'Dashboard look', 'settings.navDashboardHint': 'Title, layout and type',
+    'settings.navAdvanced': 'Media & advanced', 'settings.navAdvancedHint': 'Folders and audio device',
+    'settings.sidebarNote': 'Keep DRM, automatic resolution and automatic audio unless you are troubleshooting a problem.',
+    'settings.generalHeading': 'Startup behavior', 'settings.generalDescription': 'Set what HDMI does after a restart. Changing the default view does not switch the current content.',
+    'settings.startupHeading': 'Startup behavior', 'settings.startupDescription': 'Open the device directly into the content you use most.',
+    'settings.defaultMode': 'Default view', 'settings.defaultModeHint': 'Used only when Show automatically at startup is enabled. Saving does not immediately switch the current content.',
+    'settings.defaultContentGroup': 'Common views', 'settings.defaultMaintenanceGroup': 'Special startup',
+    'settings.outputHeading': 'HDMI output method', 'settings.outputDescription': 'DRM is preferred on ZimaOS hardware; use the other options for compatibility troubleshooting.',
+    'settings.backend': 'Display backend',
     'settings.backendAuto': 'Auto: Wayland with DRM fallback', 'settings.backendWayland': 'Wayland only',
-    'settings.backendDrm': 'DRM only', 'settings.audioDevice': 'HDMI audio device',
+    'settings.backendDrm': 'DRM only', 'settings.backendDrmDescription': 'Outputs directly to HDMI with the shortest startup path. Recommended for Intel and AMD devices.',
+    'settings.backendAutoDescription': 'Tries Wayland before DRM fallback, which can make startup slower.',
+    'settings.backendWaylandDescription': 'Choose only when Weston and Wayland are known to work on this device.',
+    'settings.recommended': 'RECOMMENDED', 'settings.advanced': 'ADVANCED',
+    'settings.resolution': 'Output resolution', 'settings.resolutionAuto': 'Automatic (display preferred)',
+    'settings.resolutionHint': 'Automatic uses the preferred mode reported by the display.',
+    'settings.restartRequired': 'These changes require a display restart', 'settings.restartRequiredHint': 'Saving does not interrupt the current output; changes apply the next time the display service starts.',
+    'settings.audioDevice': 'HDMI audio device', 'settings.audioDeviceHint': 'Keep auto unless troubleshooting missing sound with a specific mpv audio device.',
+    'settings.audioHeading': 'HDMI audio', 'settings.audioDescription': 'Automatic mode works for most TVs and monitors.',
     'settings.dashboardLanguage': 'Display language', 'settings.dashboardTitle': 'Dashboard title',
+    'settings.dashboardTitleHint': 'Shown at the upper left of the dashboard.', 'settings.dashboardLanguageHint': 'Also becomes the Web control language.',
     'settings.dashboardLayout': 'Dashboard layout', 'settings.layoutAuto': 'Automatic',
     'settings.layoutStandard': 'Standard layout', 'settings.layoutLarge': 'Large-type layout',
+    'settings.dashboardLayoutHint': 'Automatic selects a more readable layout for the connected display size.',
     'settings.fontScale': 'Font size', 'settings.fontScaleHint': 'Very large values scale more gently to avoid overlapping nearby content.',
     'settings.previewHeading': 'Dashboard preview', 'settings.previewHint': 'Uses the same scene data and coordinates as HDMI.',
     'settings.previewResolution': 'Preview resolution', 'settings.previewCurrent': 'Current display',
-    'settings.resetDashboard': 'Reset dashboard', 'settings.applyDashboard': 'Save and apply to HDMI',
+    'settings.resetDashboard': 'Reset dashboard',
+    'settings.advancedHeading': 'Media and advanced', 'settings.advancedDescription': 'Usually no changes are needed. Incorrect paths or device names can hide media or disable HDMI sound.',
+    'settings.troubleshootingHeading': 'Display output', 'settings.troubleshootingDescription': 'HDMI output method, resolution and audio device',
+    'settings.mediaHeading': 'Media playback', 'settings.mediaDescription': 'End behavior, slideshow timing and accessible folders',
+    'settings.singleVideoEnd': 'When one video ends', 'settings.singleVideoRepeat': 'Play it again', 'settings.singleVideoStop': 'Stop at the end',
+    'settings.singleVideoEndHint': 'Used when playing a single video file.',
+    'settings.collectionEnd': 'When a folder or playlist ends', 'settings.collectionRepeat': 'Restart from the first item', 'settings.collectionStop': 'Stop after the last item',
+    'settings.collectionEndHint': 'Used for selected files and image-folder slideshows.',
+    'settings.slideshowInterval': 'Default time per image', 'settings.slideshowIntervalHint': 'The Media page can override this for one playback.',
     'settings.mediaRoots': 'Media folders',
+    'settings.mediaRootsDescription': 'Controls which locations the file browser can access',
     'settings.mediaRootsHint': 'One folder per line. Paths must be under /DATA, /media or /mnt.',
-    'settings.autoStart': 'Take over HDMI at startup',
-    'settings.autoStartHint': 'Keep the system terminal when disabled',
+    'settings.sourcesHeading': 'Remote device data', 'settings.sourcesDescription': 'Collect CPU, memory and network data over SSH for free-canvas widgets',
+    'settings.sourceName': 'Device name', 'settings.sourceHost': 'IP / hostname', 'settings.sourcePort': 'SSH port', 'settings.sourceUser': 'SSH user', 'settings.sourcePassword': 'SSH password',
+    'settings.sourceAdd': 'Test and add', 'settings.sourceAdding': 'Testing SSH and collecting data...', 'settings.sourceAdded': 'Remote device added', 'settings.sourceRemoved': 'Remote device removed',
+    'settings.sourceSecurity': 'The password stays in a restricted file on this device and is never returned to the browser. The SSH host fingerprint is pinned on first connection.',
+    'settings.sourceEmpty': 'No remote devices yet. Add one to select it from free-canvas widgets.', 'settings.sourceOnline': 'ONLINE', 'settings.sourceOffline': 'OFFLINE', 'settings.sourceDelete': 'Delete',
+    'settings.maintenanceHeading': 'Screen maintenance', 'settings.maintenanceDescription': 'Use only to pause output or restore the system terminal',
+    'settings.autoStart': 'Show automatically at startup',
+    'settings.autoStartHint': 'Keep the system terminal at startup when disabled',
     'settings.notLoaded': 'Configuration has not loaded yet',
-    'settings.saved': 'Settings saved. Backend changes apply after the next renderer start.',
-    'settings.applied': 'Dashboard settings saved and applied to HDMI',
+    'settings.saved': 'Settings saved',
+    'settings.applied': 'Settings saved',
+    'settings.applyDisplay': 'Save settings', 'settings.applyHint': 'Saving does not switch the current content. Output method and resolution apply after the next display restart.',
+    'settings.unsaved': 'Unsaved changes', 'settings.noChanges': 'No changes to save', 'settings.changesPending': 'Settings changed and not yet saved',
+    'settings.aboutKicker': 'ABOUT', 'settings.aboutHeading': 'Zima Display',
+    'settings.aboutDescription': 'View the installed version, source code and issue tracker.', 'settings.version': 'Version',
     'settings.switched': 'Switched to {mode}',
     'common.close': 'Close', 'common.cancel': 'Cancel', 'common.save': 'Save settings'
   }
@@ -182,9 +306,12 @@ const translations = {
 const state = {
   status: null, media: null, selected: new Set(), poll: null, volumeTimer: null,
   locale: detectLocale(), serviceOnline: null, pendingDashboardLocale: null,
-  localeSync: Promise.resolve(), dshPoll: null, previewTimer: null,
-  livePreviewSequence: 0, settingsPreviewSequence: 0, canvasPreviewSequence: 0,
-  canvasDraft: null, canvasDirty: false, selectedCanvasWidget: null, canvasDrag: null
+  localeSync: Promise.resolve(), dshPoll: null, dashboardPreviewTimer: null,
+  livePreviewSequence: 0, dashboardPreviewSequence: 0, canvasPreviewSequence: 0,
+  canvasDraft: null, canvasDirty: false, selectedCanvasWidget: null, canvasDrag: null,
+  dashboardDraft: null, dashboardDirty: false,
+  settingsInitialSnapshot: '', activeWorkspace: null, workspaceSelectedManually: false,
+  slideshowIntervalChanged: false
 };
 
 const $ = id => document.getElementById(id);
@@ -210,8 +337,10 @@ function t(key, params = {}) {
 function applyTranslations() {
   document.documentElement.lang = state.locale;
   $$('[data-i18n]').forEach(element => { element.textContent = t(element.dataset.i18n); });
+  $$('[data-i18n-label]').forEach(element => { element.setAttribute('label', t(element.dataset.i18nLabel)); });
   $$('[data-i18n-aria-label]').forEach(element => { element.setAttribute('aria-label', t(element.dataset.i18nAriaLabel)); });
   $$('[data-i18n-placeholder]').forEach(element => { element.setAttribute('placeholder', t(element.dataset.i18nPlaceholder)); });
+  $$('[data-i18n-alt]').forEach(element => { element.setAttribute('alt', t(element.dataset.i18nAlt)); });
   $('languageSelect').value = state.locale;
 }
 
@@ -224,6 +353,11 @@ function setLocale(locale, syncDashboard = false) {
   if (state.status) renderStatus(state.status);
   if (state.media) renderMedia();
   if ($('dshInstallButton')) loadDSHIntegration();
+  if ($('settingsDialog')?.open) {
+    populateResolutionOptions();
+    updateSettingsDeviceSummary();
+    updateSettingsDirty();
+  }
   if (syncDashboard) queueDashboardLocale(state.locale);
 }
 
@@ -243,6 +377,15 @@ async function persistDashboardLocale(locale) {
   try {
     const saved = await request('/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
     if (state.status) state.status.config = saved;
+    if (state.dashboardDraft) {
+      if (state.dashboardDirty) {
+        state.dashboardDraft.language = locale;
+      } else {
+        state.dashboardDraft = cloneDashboard(saved.dashboard);
+      }
+      $('dashboardLanguageInput').value = locale;
+      scheduleDashboardPreview();
+    }
     if (state.canvasDraft) {
       updateCanvasInspector();
       renderCanvasEditorPreview();
@@ -277,9 +420,9 @@ function setConnectionBadge(online) {
   badge.replaceChildren(document.createElement('i'), document.createTextNode(t(online ? 'status.online' : 'status.offline')));
 }
 
-function setText(id, value) { $(id).textContent = value; }
+function setText(id, value) { const element = $(id); if (element) element.textContent = value; }
 function clamp(value, min, max) { return Math.min(max, Math.max(min, Number(value) || 0)); }
-function setBar(id, value) { $(id).style.width = `${clamp(value, 0, 100)}%`; }
+function setBar(id, value) { const element = $(id); if (element) element.style.width = `${clamp(value, 0, 100)}%`; }
 
 function bgrToCSS(value) {
   const color = String(value || '000000').replace('#', '').padStart(6, '0').slice(-6);
@@ -367,20 +510,60 @@ function formatTime(seconds) {
 function modeLabel(mode) { return t(`modePreview.${mode || 'unknown'}`); }
 function modeTitle(mode) { return t(mode === 'terminal' ? 'modes.systemTerminal' : `modes.${mode || 'unknown'}`); }
 
+function workspaceForMode(mode) {
+  if (mode === 'canvas') return 'canvas';
+  if (['video', 'slideshow', 'presentation'].includes(mode)) return 'media';
+  return 'dashboard';
+}
+
+function setWorkspace(workspace, manual = true, scroll = true) {
+  const selected = ['dashboard', 'canvas', 'media'].includes(workspace) ? workspace : 'dashboard';
+  state.activeWorkspace = selected;
+  if (manual) state.workspaceSelectedManually = true;
+  $$('[data-workspace-choice]').forEach(button => {
+    const active = button.dataset.workspaceChoice === selected;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+  $$('[data-workspace-panel]').forEach(panel => { panel.hidden = panel.dataset.workspacePanel !== selected; });
+  const panel = $(`${selected}Workspace`);
+  if (selected === 'canvas' && state.canvasDraft) renderCanvasEditorPreview();
+  if (scroll) panel?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+}
+
 function updateClock() {
   const value = new Date().toLocaleTimeString(state.locale, { hour: '2-digit', minute: '2-digit', hour12: false });
   setText('headerClock', value);
   setText('previewClock', value);
 }
 
-async function loadLiveDashboardPreview(mode) {
+async function loadLiveOutputPreview(mode) {
   const container = $('liveScenePreview');
+  const mediaPreview = $('liveMediaPreview');
+  if (!$('currentOutputDetails')?.open) return;
+  const sequence = ++state.livePreviewSequence;
+  if (['video', 'slideshow', 'presentation'].includes(mode)) {
+    container.hidden = true;
+    mediaPreview.onload = () => {
+      if (sequence !== state.livePreviewSequence) return;
+      mediaPreview.hidden = false;
+      $('screenPreview').classList.add('scene-active');
+    };
+    mediaPreview.onerror = () => {
+      if (sequence !== state.livePreviewSequence) return;
+      mediaPreview.hidden = true;
+      $('screenPreview').classList.remove('scene-active');
+    };
+    mediaPreview.src = `${API}/preview/frame?t=${Date.now()}`;
+    return;
+  }
+  mediaPreview.hidden = true;
+  mediaPreview.removeAttribute('src');
   if (mode !== 'dashboard' && mode !== 'canvas') {
     container.hidden = true;
     $('screenPreview').classList.remove('scene-active');
     return;
   }
-  const sequence = ++state.livePreviewSequence;
   try {
     const scene = await request(`/preview/${mode}`);
     if (sequence !== state.livePreviewSequence) return;
@@ -421,6 +604,12 @@ function renderStatus(data) {
   const gpu = metrics.gpu || {};
   const mode = player.mode || config.default_mode || 'dashboard';
 
+  if (!state.slideshowIntervalChanged && config.media?.slideshow_interval_seconds) {
+    $('slideshowInterval').value = String(config.media.slideshow_interval_seconds);
+  }
+
+  if (!state.workspaceSelectedManually) setWorkspace(workspaceForMode(mode), false, false);
+
   $$('.mode-button').forEach(button => button.classList.toggle('active', button.dataset.mode === mode));
   setText('previewMode', modeLabel(mode));
   setText('previewTitle', config.dashboard?.title || 'Zima Display');
@@ -457,8 +646,77 @@ function renderStatus(data) {
   setText('ipAddress', metrics.ip_addresses?.[0] || t('metrics.waitingNetwork'));
   setText('temperatureMetric', Math.round(metrics.temperature_c || gpu.temperature_c || 0));
   setText('gpuName', [gpu.vendor, gpu.name].filter(Boolean).join(' · ') || t('metrics.autoGraphics'));
+  renderRemoteSources();
+  hydrateDashboardEditor(config.dashboard);
   if (!state.canvasDraft) hydrateCanvasEditor(config.canvas);
-  loadLiveDashboardPreview(mode);
+  else updateCanvasInspector();
+  loadLiveOutputPreview(mode);
+}
+
+function renderRemoteSources() {
+  const container = $('remoteSourcesList');
+  if (!container) return;
+  const configured = state.status?.config?.sources || [];
+  const statuses = new Map((state.status?.sources || []).map(source => [source.id, source]));
+  if (!configured.length) {
+    const empty = document.createElement('div');
+    empty.className = 'remote-source-empty';
+    empty.textContent = t('settings.sourceEmpty');
+    container.replaceChildren(empty);
+    return;
+  }
+  container.replaceChildren(...configured.map(source => {
+    const status = statuses.get(source.id) || {};
+    const row = document.createElement('div');
+    row.className = 'remote-source-row';
+    const copy = document.createElement('div');
+    const name = document.createElement('b');
+    name.textContent = source.name;
+    const detail = document.createElement('small');
+    detail.textContent = `${source.user}@${source.host}:${source.port || 22}${status.error ? ` · ${status.error}` : ''}`;
+    copy.append(name, detail);
+    const badge = document.createElement('span');
+    badge.className = `source-state${status.online ? ' online' : ''}`;
+    badge.textContent = t(status.online ? 'settings.sourceOnline' : 'settings.sourceOffline');
+    const remove = document.createElement('button');
+    remove.className = 'remote-source-delete';
+    remove.type = 'button';
+    remove.textContent = t('settings.sourceDelete');
+    remove.addEventListener('click', () => deleteRemoteSource(source.id));
+    row.append(copy, badge, remove);
+    return row;
+  }));
+}
+
+async function addRemoteSource() {
+  const button = $('addRemoteSourceButton');
+  const payload = {
+    name: $('sourceNameInput').value.trim(), host: $('sourceHostInput').value.trim(),
+    port: Number($('sourcePortInput').value) || 22, user: $('sourceUserInput').value.trim(),
+    password: $('sourcePasswordInput').value, poll_interval_seconds: 5
+  };
+  button.disabled = true;
+  showToast(t('settings.sourceAdding'));
+  try {
+    await request('/sources', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    ['sourceNameInput', 'sourceHostInput', 'sourceUserInput', 'sourcePasswordInput'].forEach(id => { $(id).value = ''; });
+    showToast(t('settings.sourceAdded'));
+    await refreshStatus();
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function deleteRemoteSource(id) {
+  try {
+    await request(`/sources/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    showToast(t('settings.sourceRemoved'));
+    await refreshStatus();
+  } catch (error) {
+    showToast(error.message, true);
+  }
 }
 
 async function loadDSHIntegration() {
@@ -642,7 +900,21 @@ function selectedCanvasWidget() {
 function updateCanvasInspector() {
   const widget = selectedCanvasWidget();
   $('canvasInspector').classList.toggle('disabled', !widget);
+  $('canvasSourceField').hidden = !widget || !['cpu', 'memory', 'storage', 'temperature', 'network', 'ip', 'hostname'].includes(widget.type);
   if (!widget) return;
+  const sourceSelect = $('canvasWidgetSourceInput');
+  const statuses = new Map((state.status?.sources || []).map(source => [source.id, source]));
+  const localOption = document.createElement('option');
+  localOption.value = '';
+  localOption.textContent = t('canvas.sourceLocal');
+  const remoteOptions = (state.status?.config?.sources || []).map(source => {
+    const option = document.createElement('option');
+    option.value = source.id;
+    option.textContent = `${source.name} · ${t(statuses.get(source.id)?.online ? 'settings.sourceOnline' : 'settings.sourceOffline')}`;
+    return option;
+  });
+  sourceSelect.replaceChildren(localOption, ...remoteOptions);
+  sourceSelect.value = widget.source_id || '';
   $('canvasWidgetTextInput').value = widget.type === 'text' ? (widget.text || '') : t(`canvas.widget.${widget.type}`);
   $('canvasWidgetTextInput').disabled = widget.type !== 'text';
   $('canvasWidgetXInput').value = widget.x;
@@ -693,7 +965,9 @@ async function renderCanvasEditorPreview() {
 }
 
 function applyCanvasTemplate() {
-  state.canvasDraft = canvasTemplate($('canvasTemplateInput').value);
+  const template = $('canvasTemplateInput').value;
+  state.canvasDraft = canvasTemplate(template);
+  $$('[data-canvas-template]').forEach(button => button.classList.toggle('active', button.dataset.canvasTemplate === template));
   state.selectedCanvasWidget = state.canvasDraft.widgets[0]?.id || null;
   $('canvasBackgroundTypeInput').value = state.canvasDraft.background_type;
   $('canvasBackgroundColorInput').value = state.canvasDraft.background_color;
@@ -737,6 +1011,7 @@ function updateSelectedCanvasWidget() {
   widget.font_size = clamp($('canvasWidgetFontInput').value, 12, 300);
   widget.color = $('canvasWidgetColorInput').value;
   widget.bold = $('canvasWidgetBoldInput').checked;
+  widget.source_id = $('canvasSourceField').hidden ? '' : $('canvasWidgetSourceInput').value;
   if (widget.type === 'text') widget.text = $('canvasWidgetTextInput').value || 'Text';
   setCanvasDirty();
   updateCanvasInspector();
@@ -844,90 +1119,206 @@ async function saveCanvas(apply = false) {
   }
 }
 
-function dashboardSettingsDraft() {
-  const current = state.status?.config?.dashboard || {};
-  return {
-    title: $('dashboardTitleInput').value.trim() || 'Zima Display',
-    language: $('dashboardLanguageInput').value || 'zh-CN',
-    layout: $('dashboardLayoutInput').value || 'auto',
-    font_scale: clamp(Number($('fontScaleInput').value) / 100, 0.8, 2),
-    refresh_interval_ms: current.refresh_interval_ms || 1000
-  };
+function cloneDashboard(dashboard) {
+  return JSON.parse(JSON.stringify(dashboard || { title: 'Zima Display', language: 'zh-CN', layout: 'auto', font_scale: 1, refresh_interval_ms: 1000 }));
+}
+
+function dashboardSettingsDraft() { return cloneDashboard(state.dashboardDraft); }
+
+function hydrateDashboardEditor(dashboard) {
+  if (state.dashboardDraft && state.dashboardDirty) return;
+  const next = cloneDashboard(dashboard);
+  if (state.dashboardDraft && JSON.stringify(state.dashboardDraft) === JSON.stringify(next)) return;
+  state.dashboardDraft = next;
+  $('dashboardTitleInput').value = state.dashboardDraft.title || 'Zima Display';
+  $('dashboardLanguageInput').value = state.dashboardDraft.language || 'zh-CN';
+  $('dashboardLayoutInput').value = state.dashboardDraft.layout || 'auto';
+  $('fontScaleInput').value = Math.round((state.dashboardDraft.font_scale || 1) * 100);
+  setDashboardDirty(false);
+  scheduleDashboardPreview();
+}
+
+function readDashboardControls() {
+  if (!state.dashboardDraft) return;
+  state.dashboardDraft.title = $('dashboardTitleInput').value.trim() || 'Zima Display';
+  state.dashboardDraft.language = $('dashboardLanguageInput').value || 'zh-CN';
+  state.dashboardDraft.layout = $('dashboardLayoutInput').value || 'auto';
+  state.dashboardDraft.font_scale = clamp(Number($('fontScaleInput').value) / 100, 0.8, 2);
+  setDashboardDirty();
+  scheduleDashboardPreview();
+}
+
+function setDashboardDirty(dirty = true) {
+  state.dashboardDirty = dirty;
+  $('saveDashboardButton').disabled = !dirty;
 }
 
 function updateFontScaleLabel() {
   setText('fontScaleValue', `${$('fontScaleInput').value}%`);
 }
 
-function scheduleSettingsPreview() {
-  updateFontScaleLabel();
-  clearTimeout(state.previewTimer);
-  state.previewTimer = setTimeout(loadSettingsPreview, 120);
+function selectedRendererBackend() {
+  return $$('input[name="rendererBackend"]').find(input => input.checked)?.value || 'drm';
 }
 
-async function loadSettingsPreview() {
+function settingsConfigDraft(current = state.status?.config) {
+  if (!current) return null;
+  const updated = JSON.parse(JSON.stringify(current));
+  updated.default_mode = $('defaultModeInput').value;
+  updated.renderer.backend = selectedRendererBackend();
+  updated.renderer.resolution = $('resolutionInput').value || 'auto';
+  updated.renderer.audio_device = $('audioDeviceInput').value.trim() || 'auto';
+  updated.media = {
+    single_video_end: $('singleVideoEndInput').value || 'repeat',
+    collection_end: $('collectionEndInput').value || 'repeat',
+    slideshow_interval_seconds: Number($('slideshowIntervalInput').value) || 8
+  };
+  updated.media_roots = $('mediaRootsInput').value.split('\n').map(value => value.trim()).filter(Boolean);
+  updated.auto_start_display = $('autoStartInput').checked;
+  updated.volume = Number($('volumeRange').value);
+  return updated;
+}
+
+function settingsFingerprint(config) {
+  if (!config) return '';
+  return JSON.stringify({
+    default_mode: config.default_mode,
+    auto_start_display: config.auto_start_display,
+    renderer: config.renderer,
+    media: config.media,
+    media_roots: config.media_roots
+  });
+}
+
+function updateSettingsDirty() {
   if (!$('settingsDialog').open) return;
-  const sequence = ++state.settingsPreviewSequence;
+  const dirty = settingsFingerprint(settingsConfigDraft()) !== state.settingsInitialSnapshot;
+  $('settingsDirtyBadge').hidden = !dirty;
+  $('applySettingsButton').disabled = !dirty;
+  setText('settingsSaveState', t(dirty ? 'settings.changesPending' : 'settings.noChanges'));
+}
+
+function populateResolutionOptions() {
+  const select = $('resolutionInput');
+  const configured = ($('settingsDialog').open && select.value) || state.status?.config?.renderer?.resolution || 'auto';
+  const modes = new Set((state.status?.metrics?.display?.modes || []).filter(mode => /^\d+x\d+$/.test(mode)));
+  if (configured !== 'auto') modes.add(configured);
+  const option = (value, label) => {
+    const element = document.createElement('option');
+    element.value = value;
+    element.textContent = label;
+    return element;
+  };
+  select.replaceChildren(option('auto', t('settings.resolutionAuto')), ...Array.from(modes).map(mode => option(mode, mode.replace('x', ' × '))));
+  select.value = configured;
+}
+
+function updateSettingsDeviceSummary() {
+  const display = state.status?.metrics?.display || {};
+  const player = state.status?.player || {};
+  const displayState = t(display.connected ? 'settings.deviceConnected' : 'settings.deviceDisconnected');
+  const rendererState = t(player.renderer_ready ? 'settings.rendererReady' : 'settings.rendererUnavailable');
+  setText('settingsDeviceState', `${displayState} · ${rendererState}`);
+  setText('settingsConnector', display.connector || '--');
+  setText('settingsCurrentMode', modeTitle(player.mode || 'unknown'));
+}
+
+function scheduleDashboardPreview() {
+  updateFontScaleLabel();
+  clearTimeout(state.dashboardPreviewTimer);
+  state.dashboardPreviewTimer = setTimeout(loadDashboardPreview, 120);
+}
+
+async function loadDashboardPreview() {
+  if (!state.dashboardDraft) return;
+  const sequence = ++state.dashboardPreviewSequence;
   try {
     const scene = await request('/preview/dashboard', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ dashboard: dashboardSettingsDraft(), resolution: $('previewResolutionInput').value })
     });
-    if (sequence === state.settingsPreviewSequence) renderScene($('settingsScenePreview'), scene);
+    if (sequence === state.dashboardPreviewSequence) renderScene($('dashboardScenePreview'), scene);
   } catch (error) {
     showToast(error.message, true);
   }
 }
 
 function resetDashboardSettings() {
-  $('dashboardTitleInput').value = 'Zima Display';
-  $('dashboardLanguageInput').value = state.locale;
-  $('dashboardLayoutInput').value = 'auto';
+  state.dashboardDraft = {
+    title: 'Zima Display', language: state.locale, layout: 'auto', font_scale: 1,
+    refresh_interval_ms: state.status?.config?.dashboard?.refresh_interval_ms || 1000
+  };
+  $('dashboardTitleInput').value = state.dashboardDraft.title;
+  $('dashboardLanguageInput').value = state.dashboardDraft.language;
+  $('dashboardLayoutInput').value = state.dashboardDraft.layout;
   $('fontScaleInput').value = '100';
-  scheduleSettingsPreview();
+  setDashboardDirty();
+  scheduleDashboardPreview();
+}
+
+async function saveDashboard(apply = false) {
+  if (!state.status?.config || !state.dashboardDraft) return;
+  const updated = JSON.parse(JSON.stringify(state.status.config));
+  updated.dashboard = dashboardSettingsDraft();
+  try {
+    const saved = await request('/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
+    if (state.status) state.status.config = saved;
+    state.dashboardDraft = cloneDashboard(saved.dashboard);
+    setDashboardDirty(false);
+    setLocale(saved.dashboard?.language || state.locale);
+    if (apply) await request('/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mode', mode: 'dashboard' }) });
+    showToast(t(apply ? 'dashboard.applied' : 'dashboard.saved'));
+    await refreshStatus();
+  } catch (error) {
+    showToast(error.message, true);
+  }
+}
+
+async function loadAboutInfo() {
+  try {
+    const health = await request('/health');
+    setText('appVersion', health.version || '--');
+  } catch (_) {
+    setText('appVersion', '--');
+  }
 }
 
 function openSettings() {
   const config = state.status?.config;
   if (!config) return showToast(t('settings.notLoaded'), true);
   $('defaultModeInput').value = config.default_mode;
-  $('backendInput').value = config.renderer?.backend || 'auto';
+  $$('input[name="rendererBackend"]').forEach(input => { input.checked = input.value === (config.renderer?.backend || 'drm'); });
   $('audioDeviceInput').value = config.renderer?.audio_device || 'auto';
-  $('dashboardLanguageInput').value = config.dashboard?.language || 'zh-CN';
-  $('dashboardTitleInput').value = config.dashboard?.title || 'Zima Display';
-  $('dashboardLayoutInput').value = config.dashboard?.layout || 'auto';
-  $('fontScaleInput').value = Math.round((config.dashboard?.font_scale || 1) * 100);
-  updateFontScaleLabel();
+  $('singleVideoEndInput').value = config.media?.single_video_end || 'repeat';
+  $('collectionEndInput').value = config.media?.collection_end || 'repeat';
+  $('slideshowIntervalInput').value = String(config.media?.slideshow_interval_seconds || 8);
   $('mediaRootsInput').value = (config.media_roots || ['/DATA']).join('\n');
   $('autoStartInput').checked = Boolean(config.auto_start_display);
+  populateResolutionOptions();
+  state.settingsInitialSnapshot = settingsFingerprint(config);
   $('settingsDialog').showModal();
-  loadSettingsPreview();
+  updateSettingsDeviceSummary();
+  updateSettingsDirty();
+  loadAboutInfo();
+}
+
+function closeSettings() {
+  $('settingsDialog').close();
+  state.settingsInitialSnapshot = '';
 }
 
 async function saveSettings(event) {
   event.preventDefault();
   const current = state.status?.config;
   if (!current) return;
-  const updated = JSON.parse(JSON.stringify(current));
-  updated.default_mode = $('defaultModeInput').value;
-  updated.renderer.backend = $('backendInput').value;
-  updated.renderer.audio_device = $('audioDeviceInput').value.trim() || 'auto';
-  updated.dashboard.language = $('dashboardLanguageInput').value;
-  updated.dashboard.title = $('dashboardTitleInput').value.trim() || 'Zima Display';
-  updated.dashboard.layout = $('dashboardLayoutInput').value;
-  updated.dashboard.font_scale = Number($('fontScaleInput').value) / 100;
-  updated.media_roots = $('mediaRootsInput').value.split('\n').map(value => value.trim()).filter(Boolean);
-  updated.auto_start_display = $('autoStartInput').checked;
-  updated.volume = Number($('volumeRange').value);
+  const updated = settingsConfigDraft(current);
   try {
     const saved = await request('/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
     if (state.status) state.status.config = saved;
     setLocale(saved.dashboard?.language || state.locale);
-    if (event.submitter?.dataset.applyDashboard === 'true') {
-      await request('/action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mode', mode: 'dashboard' }) });
-    }
-    $('settingsDialog').close();
-    showToast(t(event.submitter?.dataset.applyDashboard === 'true' ? 'settings.applied' : 'settings.saved'));
+    state.settingsInitialSnapshot = settingsFingerprint(saved);
+    closeSettings();
+    showToast(t('settings.saved'));
     await refreshStatus();
     await loadMedia();
   } catch (error) {
@@ -953,6 +1344,18 @@ async function upload(file) {
 
 function bindEvents() {
   $('languageSelect').addEventListener('change', event => setLocale(event.target.value, true));
+  $$('[data-workspace-choice]').forEach(button => button.addEventListener('click', () => setWorkspace(button.dataset.workspaceChoice)));
+  $('viewCurrentOutputButton').addEventListener('click', () => {
+    $('currentOutputDetails').open = true;
+    $('currentOutputDetails').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const mode = state.status?.player?.mode || state.status?.config?.default_mode || 'dashboard';
+    loadLiveOutputPreview(mode);
+  });
+  $('currentOutputDetails').addEventListener('toggle', () => {
+    if (!$('currentOutputDetails').open) return;
+    const mode = state.status?.player?.mode || state.status?.config?.default_mode || 'dashboard';
+    loadLiveOutputPreview(mode);
+  });
   $$('.mode-button').forEach(button => button.addEventListener('click', () => action({ action: 'mode', mode: button.dataset.mode }, t('settings.switched', { mode: modeTitle(button.dataset.mode) }))));
   $$('.transport button').forEach(button => button.addEventListener('click', () => action({ action: button.dataset.action })));
   $('progressRange').addEventListener('change', () => {
@@ -978,20 +1381,31 @@ function bindEvents() {
     const count = Number($('playDirectoryButton').dataset.count || 0);
     if (state.media?.path && count > 0) action({ action: 'slideshow', path: state.media.path, value: seconds }, t('media.slideshowStarted', { count, seconds }));
   });
+  $('slideshowInterval').addEventListener('change', () => { state.slideshowIntervalChanged = true; });
   $('playSelectedButton').addEventListener('click', () => action({ action: 'play', paths: Array.from(state.selected) }, t('media.loaded', { count: state.selected.size })));
   $('uploadButton').addEventListener('click', () => $('uploadInput').click());
   $('uploadInput').addEventListener('change', event => upload(event.target.files?.[0]));
   $('settingsButton').addEventListener('click', openSettings);
-  $('closeSettingsButton').addEventListener('click', () => $('settingsDialog').close());
-  $('cancelSettingsButton').addEventListener('click', () => $('settingsDialog').close());
+  $('closeSettingsButton').addEventListener('click', closeSettings);
+  $('cancelSettingsButton').addEventListener('click', closeSettings);
+  $('settingsDialog').addEventListener('cancel', event => { event.preventDefault(); closeSettings(); });
   $('settingsForm').addEventListener('submit', saveSettings);
-  ['dashboardLanguageInput', 'dashboardTitleInput', 'dashboardLayoutInput', 'fontScaleInput', 'previewResolutionInput'].forEach(id => $(id).addEventListener('input', scheduleSettingsPreview));
+  $('settingsForm').addEventListener('input', updateSettingsDirty);
+  $('settingsForm').addEventListener('change', updateSettingsDirty);
+  ['dashboardLanguageInput', 'dashboardTitleInput', 'dashboardLayoutInput', 'fontScaleInput'].forEach(id => $(id).addEventListener('input', readDashboardControls));
+  $('previewResolutionInput').addEventListener('input', scheduleDashboardPreview);
   $('resetDashboardButton').addEventListener('click', resetDashboardSettings);
+  $('saveDashboardButton').addEventListener('click', () => saveDashboard(false));
+  $('applyDashboardButton').addEventListener('click', () => saveDashboard(true));
   ['canvasBackgroundTypeInput', 'canvasBackgroundColorInput', 'canvasSecondaryColorInput', 'canvasBackgroundImageInput'].forEach(id => $(id).addEventListener('input', readCanvasBackgroundControls));
+  $$('[data-canvas-template]').forEach(button => button.addEventListener('click', () => {
+    $('canvasTemplateInput').value = button.dataset.canvasTemplate;
+    applyCanvasTemplate();
+  }));
   $('applyCanvasTemplateButton').addEventListener('click', applyCanvasTemplate);
   $('addCanvasWidgetButton').addEventListener('click', addCanvasWidget);
   $('removeCanvasWidgetButton').addEventListener('click', removeCanvasWidget);
-  ['canvasWidgetTextInput', 'canvasWidgetXInput', 'canvasWidgetYInput', 'canvasWidgetWidthInput', 'canvasWidgetHeightInput', 'canvasWidgetFontInput', 'canvasWidgetColorInput', 'canvasWidgetBoldInput'].forEach(id => $(id).addEventListener('input', updateSelectedCanvasWidget));
+  ['canvasWidgetTextInput', 'canvasWidgetSourceInput', 'canvasWidgetXInput', 'canvasWidgetYInput', 'canvasWidgetWidthInput', 'canvasWidgetHeightInput', 'canvasWidgetFontInput', 'canvasWidgetColorInput', 'canvasWidgetBoldInput'].forEach(id => $(id).addEventListener('input', updateSelectedCanvasWidget));
   $('saveCanvasButton').addEventListener('click', () => saveCanvas(false));
   $('applyCanvasButton').addEventListener('click', () => saveCanvas(true));
   $('uploadCanvasBackgroundButton').addEventListener('click', () => $('canvasBackgroundUploadInput').click());
@@ -1001,6 +1415,7 @@ function bindEvents() {
   $('canvasScenePreview').addEventListener('pointerup', endCanvasDrag);
   $('canvasScenePreview').addEventListener('pointercancel', endCanvasDrag);
   $('dshInstallButton').addEventListener('click', installDSHSkill);
+  $('addRemoteSourceButton').addEventListener('click', addRemoteSource);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

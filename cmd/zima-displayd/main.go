@@ -19,6 +19,7 @@ import (
 	"zima-display/internal/gateway"
 	"zima-display/internal/metrics"
 	"zima-display/internal/player"
+	"zima-display/internal/remote"
 	"zima-display/internal/server"
 )
 
@@ -53,11 +54,18 @@ func main() {
 	}
 	controller := player.New(filepath.Join(*runtimePath, "mpv.sock"), *runtimePath, store.Get)
 	api := server.New(logger, store, controller, version)
+	secretStore, err := remote.NewSecretStore(*dataDir)
+	if err != nil {
+		logger.Fatalf("load remote source secrets: %v", err)
+	}
+	remoteManager := remote.NewManager(store.Get, secretStore)
+	api.SetSourceService(remoteManager)
 	collector := metrics.NewCollector(*dataDir)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
-	go collectMetrics(ctx, logger, store, collector, api, controller)
+	go remoteManager.Run(ctx)
+	go collectMetrics(ctx, logger, store, collector, remoteManager, api, controller)
 
 	mux := http.NewServeMux()
 	mux.Handle("/zima-display/api/", api.Handler())
@@ -113,11 +121,12 @@ func main() {
 	}
 }
 
-func collectMetrics(ctx context.Context, logger *log.Logger, store *config.Store, collector *metrics.Collector, api *server.Server, controller *player.Manager) {
+func collectMetrics(ctx context.Context, logger *log.Logger, store *config.Store, collector *metrics.Collector, remoteManager *remote.Manager, api *server.Server, controller *player.Manager) {
 	for {
 		snapshot := collector.Sample(ctx)
 		api.SetMetrics(snapshot)
 		controller.UpdateMetrics(ctx, snapshot)
+		controller.UpdateRemoteMetrics(ctx, remoteManager.Snapshots())
 		path := filepath.Join(store.Get().DataDir, "runtime", "metrics.json")
 		if err := metrics.WriteSnapshot(path, snapshot); err != nil {
 			logger.Printf("write metrics snapshot: %v", err)

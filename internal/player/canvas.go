@@ -11,6 +11,10 @@ import (
 )
 
 func CanvasScene(snapshot metrics.Snapshot, cfg config.Config, now time.Time) Scene {
+	return CanvasSceneWithSources(snapshot, nil, cfg, now)
+}
+
+func CanvasSceneWithSources(snapshot metrics.Snapshot, sources map[string]metrics.Snapshot, cfg config.Config, now time.Time) Scene {
 	canvas := cfg.Canvas
 	background := rgbToASS(canvas.BackgroundColor)
 	b := newSceneBuilder(background, 1)
@@ -22,19 +26,32 @@ func CanvasScene(snapshot metrics.Snapshot, cfg config.Config, now time.Time) Sc
 		addGradient(b, canvas.BackgroundColor, canvas.SecondaryColor)
 	}
 	for _, widget := range canvas.Widgets {
+		widgetSnapshot := snapshot
+		sourceOnline := true
+		if widget.SourceID != "" {
+			var exists bool
+			widgetSnapshot, exists = sources[widget.SourceID]
+			sourceOnline = exists
+		}
 		b.scene.Elements = append(b.scene.Elements, SceneElement{
 			ID: widget.ID, WidgetID: widget.ID, Kind: "text",
 			X: widget.X, Y: widget.Y, Width: widget.Width, Height: widget.Height,
-			Color: rgbToASS(widget.Color), Opacity: 1, Text: canvasWidgetValue(widget, snapshot, cfg, now),
+			Color: rgbToASS(widget.Color), Opacity: 1, Text: canvasWidgetValue(widget, widgetSnapshot, sourceOnline, cfg, now),
 			FontSize: widget.FontSize, Bold: widget.Bold, Align: "left",
 		})
 	}
 	return b.scene
 }
 
-func canvasWidgetValue(widget config.CanvasWidget, snapshot metrics.Snapshot, cfg config.Config, now time.Time) string {
+func canvasWidgetValue(widget config.CanvasWidget, snapshot metrics.Snapshot, sourceOnline bool, cfg config.Config, now time.Time) string {
 	locale := dashboardLocale(cfg)
 	labels := dashboardLabelsFor(locale)
+	if widget.SourceID != "" && !sourceOnline {
+		if locale == "en-US" {
+			return "DEVICE OFFLINE"
+		}
+		return "设备离线"
+	}
 	switch widget.Type {
 	case "clock":
 		return now.Format("15:04")

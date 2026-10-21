@@ -76,6 +76,7 @@ type Manager struct {
 	mode              string
 	lastError         string
 	snapshot          metrics.Snapshot
+	remoteSnapshots   map[string]metrics.Snapshot
 	overlayConn       net.Conn
 	overlayRead       *bufio.Reader
 	requestID         atomic.Int64
@@ -88,11 +89,12 @@ type Manager struct {
 
 func New(socketPath, runtimePath string, provider func() config.Config) *Manager {
 	return &Manager{
-		socketPath:  socketPath,
-		runtimePath: runtimePath,
-		config:      provider,
-		runner:      execRunner{},
-		mode:        "terminal",
+		socketPath:      socketPath,
+		runtimePath:     runtimePath,
+		config:          provider,
+		runner:          execRunner{},
+		mode:            "terminal",
+		remoteSnapshots: make(map[string]metrics.Snapshot),
 	}
 }
 
@@ -138,11 +140,17 @@ func (m *Manager) Play(ctx context.Context, targets []string) error {
 	defer m.mu.Unlock()
 	if err := m.runRendererOperationLocked(ctx, func() error {
 		m.closeOverlayLocked()
+		cfg := m.config()
+		playlistLoop := "no"
 		fileLoop := "no"
 		if len(targets) == 1 {
-			fileLoop = "inf"
+			if cfg.Media.SingleVideoEnd == "repeat" {
+				fileLoop = "inf"
+			}
+		} else if cfg.Media.CollectionEnd == "repeat" {
+			playlistLoop = "inf"
 		}
-		if err := m.setPlaybackOptionsLocked(ctx, "inf", fileLoop, "inf"); err != nil {
+		if err := m.setPlaybackOptionsLocked(ctx, playlistLoop, fileLoop, "inf"); err != nil {
 			return err
 		}
 		return m.loadPlaylistLocked(ctx, targets)
@@ -166,7 +174,11 @@ func (m *Manager) Slideshow(ctx context.Context, images []string, durationSecond
 	defer m.mu.Unlock()
 	if err := m.runRendererOperationLocked(ctx, func() error {
 		m.closeOverlayLocked()
-		if err := m.setPlaybackOptionsLocked(ctx, "inf", "no", durationSeconds); err != nil {
+		playlistLoop := "no"
+		if m.config().Media.CollectionEnd == "repeat" {
+			playlistLoop = "inf"
+		}
+		if err := m.setPlaybackOptionsLocked(ctx, playlistLoop, "no", durationSeconds); err != nil {
 			return err
 		}
 		return m.loadPlaylistLocked(ctx, images)
@@ -177,6 +189,32 @@ func (m *Manager) Slideshow(ctx context.Context, images []string, durationSecond
 	m.mode = "slideshow"
 	m.lastError = ""
 	return nil
+}
+
+func (m *Manager) CaptureFrame(ctx context.Context) ([]byte, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if err := os.MkdirAll(m.runtimePath, 0o700); err != nil {
+		return nil, err
+	}
+	file, err := os.CreateTemp(m.runtimePath, "preview-*.jpg")
+	if err != nil {
+		return nil, err
+	}
+	path := file.Name()
+	if err := file.Close(); err != nil {
+		return nil, err
+	}
+	_ = os.Remove(path)
+	defer os.Remove(path)
+	if err := m.send(ctx, []any{"screenshot-to-file", path, "subtitles"}, nil); err != nil {
+		return nil, err
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read captured frame: %w", err)
+	}
+	return data, nil
 }
 
 func (m *Manager) Present(ctx context.Context, id, title, kind string, pages []string) error {
@@ -258,7 +296,7 @@ func (m *Manager) showGeneratedModeLocked(ctx context.Context, mode string) erro
 		m.closeOverlayLocked()
 		return nil
 	}
-	return m.setOverlayLocked(ctx, renderMode(mode, m.snapshot, cfg, time.Now()))
+	return m.setOverlayLocked(ctx, renderModeWithSources(mode, m.snapshot, m.remoteSnapshots, cfg, time.Now()))
 }
 
 func (m *Manager) UpdateMetrics(ctx context.Context, snapshot metrics.Snapshot) {
@@ -268,7 +306,24 @@ func (m *Manager) UpdateMetrics(ctx context.Context, snapshot metrics.Snapshot) 
 	if m.mode != "dashboard" && m.mode != "canvas" && m.mode != "clock" {
 		return
 	}
-	if err := m.setOverlayLocked(ctx, renderMode(m.mode, snapshot, m.config(), time.Now())); err != nil {
+	if err := m.setOverlayLocked(ctx, renderModeWithSources(m.mode, snapshot, m.remoteSnapshots, m.config(), time.Now())); err != nil {
+		m.lastError = err.Error()
+		return
+	}
+	m.lastError = ""
+}
+
+func (m *Manager) UpdateRemoteMetrics(ctx context.Context, snapshots map[string]metrics.Snapshot) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.remoteSnapshots = make(map[string]metrics.Snapshot, len(snapshots))
+	for id, snapshot := range snapshots {
+		m.remoteSnapshots[id] = snapshot
+	}
+	if m.mode != "canvas" {
+		return
+	}
+	if err := m.setOverlayLocked(ctx, renderModeWithSources(m.mode, m.snapshot, m.remoteSnapshots, m.config(), time.Now())); err != nil {
 		m.lastError = err.Error()
 		return
 	}

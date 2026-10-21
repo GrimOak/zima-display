@@ -12,7 +12,7 @@ const dictionaries = Function(`"use strict"; return (${objectMatch[1]});`)();
 const locales = Object.keys(dictionaries);
 const referenceKeys = new Set(Object.keys(dictionaries[locales[0]]));
 const usedKeys = new Set([
-  ...Array.from(html.matchAll(/data-i18n(?:-aria-label|-placeholder)?="([^"]+)"/g), match => match[1]),
+  ...Array.from(html.matchAll(/data-i18n(?:-aria-label|-placeholder|-alt)?="([^"]+)"/g), match => match[1]),
   ...Array.from(app.matchAll(/\bt\('([^']+)'/g), match => match[1])
 ]);
 const errors = [];

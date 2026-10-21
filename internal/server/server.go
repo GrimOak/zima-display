@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,6 +23,7 @@ import (
 	"zima-display/internal/metrics"
 	"zima-display/internal/player"
 	"zima-display/internal/presentation"
+	"zima-display/internal/remote"
 )
 
 const (
@@ -40,6 +42,16 @@ type Server struct {
 	metrics       metrics.Snapshot
 	presentations *presentation.Store
 	dshInstaller  *dsh.Installer
+	sources       sourceService
+}
+
+type sourceService interface {
+	Statuses() []remote.Status
+	Snapshots() map[string]metrics.Snapshot
+	Probe(context.Context, config.RemoteSource, string) (remote.ProbeResult, error)
+	SetSecret(string, string) error
+	DeleteSecret(string) error
+	Wake()
 }
 
 type statusResponse struct {
@@ -48,6 +60,7 @@ type statusResponse struct {
 	Metrics       metrics.Snapshot `json:"metrics"`
 	Player        player.Status    `json:"player"`
 	Config        config.Config    `json:"config"`
+	Sources       []remote.Status  `json:"sources,omitempty"`
 }
 
 type actionRequest struct {
@@ -93,6 +106,15 @@ type canvasPreviewRequest struct {
 	Canvas config.Canvas `json:"canvas"`
 }
 
+type sourceCreateRequest struct {
+	Name                string `json:"name"`
+	Host                string `json:"host"`
+	Port                int    `json:"port"`
+	User                string `json:"user"`
+	Password            string `json:"password"`
+	PollIntervalSeconds int    `json:"poll_interval_seconds"`
+}
+
 func New(logger *log.Logger, store *config.Store, controller *player.Manager, version string) *Server {
 	return &Server{
 		logger:        logger,
@@ -105,6 +127,8 @@ func New(logger *log.Logger, store *config.Store, controller *player.Manager, ve
 	}
 }
 
+func (s *Server) SetSourceService(service sourceService) { s.sources = service }
+
 func (s *Server) SetMetrics(snapshot metrics.Snapshot) {
 	s.mu.Lock()
 	s.metrics = snapshot
@@ -116,8 +140,11 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc(apiPrefix+"/health", s.health)
 	mux.HandleFunc(apiPrefix+"/status", s.status)
 	mux.HandleFunc(apiPrefix+"/config", s.configuration)
+	mux.HandleFunc(apiPrefix+"/sources", s.sourceCollection)
+	mux.HandleFunc(apiPrefix+"/sources/", s.sourceResource)
 	mux.HandleFunc(apiPrefix+"/preview/dashboard", s.dashboardPreview)
 	mux.HandleFunc(apiPrefix+"/preview/canvas", s.canvasPreview)
+	mux.HandleFunc(apiPrefix+"/preview/frame", s.liveFrame)
 	mux.HandleFunc(apiPrefix+"/action", s.action)
 	mux.HandleFunc(apiPrefix+"/media", s.media)
 	mux.HandleFunc(apiPrefix+"/media/content", s.mediaContent)
@@ -126,6 +153,24 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc(apiPrefix+"/integration/dsh/", s.dshIntegration)
 	mux.Handle(apiPrefix+"/v1/", s.automationAuth(http.HandlerFunc(s.automation)))
 	return s.middleware(mux)
+}
+
+func (s *Server) liveFrame(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		methodNotAllowed(w, http.MethodGet)
+		return
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+	frame, err := s.player.CaptureFrame(ctx)
+	if err != nil {
+		writeError(w, http.StatusServiceUnavailable, fmt.Errorf("capture current output: %w", err))
+		return
+	}
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(frame)))
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(frame)
 }
 
 func (s *Server) automation(w http.ResponseWriter, r *http.Request) {
@@ -331,12 +376,17 @@ func (s *Server) status(w http.ResponseWriter, r *http.Request) {
 	s.mu.RUnlock()
 	ctx, cancel := context.WithTimeout(r.Context(), 4*time.Second)
 	defer cancel()
+	var sources []remote.Status
+	if s.sources != nil {
+		sources = s.sources.Statuses()
+	}
 	writeJSON(w, http.StatusOK, statusResponse{
 		Version:       s.version,
 		ServiceUptime: time.Since(s.started).Seconds(),
 		Metrics:       snapshot,
 		Player:        s.player.Status(ctx),
 		Config:        publicConfig(s.config.Get()),
+		Sources:       sources,
 	})
 }
 
@@ -356,6 +406,7 @@ func (s *Server) configuration(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		cfg.Automation.Token = current.Automation.Token
+		cfg.Sources = current.Sources
 		if err := s.config.Replace(cfg); err != nil {
 			writeError(w, http.StatusBadRequest, err)
 			return
@@ -364,6 +415,111 @@ func (s *Server) configuration(w http.ResponseWriter, r *http.Request) {
 	default:
 		methodNotAllowed(w, http.MethodGet, http.MethodPut)
 	}
+}
+
+func (s *Server) sourceCollection(w http.ResponseWriter, r *http.Request) {
+	if s.sources == nil {
+		writeError(w, http.StatusServiceUnavailable, errors.New("remote data collection is unavailable"))
+		return
+	}
+	switch r.Method {
+	case http.MethodGet:
+		writeJSON(w, http.StatusOK, s.sources.Statuses())
+	case http.MethodPost:
+		var request sourceCreateRequest
+		if err := decodeJSON(w, r, &request); err != nil {
+			writeError(w, http.StatusBadRequest, err)
+			return
+		}
+		source := config.RemoteSource{
+			ID: newSourceID(), Name: request.Name, Host: request.Host, Port: request.Port,
+			User: request.User, PollIntervalSeconds: request.PollIntervalSeconds,
+		}
+		cfg := s.config.Get()
+		cfg.Sources = append(cfg.Sources, source)
+		if err := cfg.Validate(); err != nil {
+			writeError(w, http.StatusBadRequest, err)
+			return
+		}
+		source = cfg.Sources[len(cfg.Sources)-1]
+		ctx, cancel := context.WithTimeout(r.Context(), 8*time.Second)
+		defer cancel()
+		probe, err := s.sources.Probe(ctx, source, request.Password)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, fmt.Errorf("SSH test failed: %w", err))
+			return
+		}
+		source.HostKey = probe.HostKey
+		cfg.Sources[len(cfg.Sources)-1] = source
+		if err := s.sources.SetSecret(source.ID, request.Password); err != nil {
+			writeError(w, http.StatusInternalServerError, err)
+			return
+		}
+		if err := s.config.Replace(cfg); err != nil {
+			_ = s.sources.DeleteSecret(source.ID)
+			writeError(w, http.StatusBadRequest, err)
+			return
+		}
+		s.sources.Wake()
+		writeJSON(w, http.StatusCreated, map[string]any{"source": source, "online": true})
+	default:
+		methodNotAllowed(w, http.MethodGet, http.MethodPost)
+	}
+}
+
+func (s *Server) sourceResource(w http.ResponseWriter, r *http.Request) {
+	if s.sources == nil {
+		writeError(w, http.StatusServiceUnavailable, errors.New("remote data collection is unavailable"))
+		return
+	}
+	if r.Method != http.MethodDelete {
+		methodNotAllowed(w, http.MethodDelete)
+		return
+	}
+	id := strings.Trim(strings.TrimPrefix(r.URL.Path, apiPrefix+"/sources/"), "/")
+	if id == "" {
+		writeError(w, http.StatusNotFound, errors.New("remote source not found"))
+		return
+	}
+	cfg := s.config.Get()
+	found := false
+	filtered := make([]config.RemoteSource, 0, len(cfg.Sources))
+	for _, source := range cfg.Sources {
+		if source.ID == id {
+			found = true
+			continue
+		}
+		filtered = append(filtered, source)
+	}
+	if !found {
+		writeError(w, http.StatusNotFound, errors.New("remote source not found"))
+		return
+	}
+	for _, widget := range cfg.Canvas.Widgets {
+		if widget.SourceID == id {
+			writeError(w, http.StatusConflict, errors.New("remove this data source from canvas widgets before deleting it"))
+			return
+		}
+	}
+	cfg.Sources = filtered
+	if err := s.config.Replace(cfg); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	if err := s.sources.DeleteSecret(id); err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	s.sources.Wake()
+	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
+}
+
+func newSourceID() string {
+	data := make([]byte, 4)
+	if _, err := rand.Read(data); err == nil {
+		return fmt.Sprintf("device-%x", data)
+	}
+	return fmt.Sprintf("device-%d", time.Now().UnixNano())
 }
 
 func publicConfig(cfg config.Config) config.Config {
@@ -429,7 +585,11 @@ func (s *Server) canvasPreview(w http.ResponseWriter, r *http.Request) {
 	s.mu.RLock()
 	snapshot := s.metrics
 	s.mu.RUnlock()
-	writeJSON(w, http.StatusOK, player.CanvasScene(snapshot, cfg, time.Now()))
+	remoteSnapshots := map[string]metrics.Snapshot{}
+	if s.sources != nil {
+		remoteSnapshots = s.sources.Snapshots()
+	}
+	writeJSON(w, http.StatusOK, player.CanvasSceneWithSources(snapshot, remoteSnapshots, cfg, time.Now()))
 }
 
 func (s *Server) action(w http.ResponseWriter, r *http.Request) {
@@ -466,10 +626,7 @@ func (s *Server) action(w http.ResponseWriter, r *http.Request) {
 			err = s.player.Play(ctx, resolved)
 		}
 	case "slideshow":
-		duration := request.Value
-		if duration == 0 {
-			duration = 8
-		}
+		duration := slideshowDuration(s.config.Get(), request.Value)
 		var images []string
 		images, err = resolveSlideshowTargets(s.config.Get(), request.Path)
 		if err == nil {
@@ -502,6 +659,13 @@ func (s *Server) action(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
+}
+
+func slideshowDuration(cfg config.Config, requested float64) float64 {
+	if requested > 0 {
+		return requested
+	}
+	return float64(cfg.Media.SlideshowIntervalSeconds)
 }
 
 func (s *Server) media(w http.ResponseWriter, r *http.Request) {

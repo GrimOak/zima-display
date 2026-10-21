@@ -54,11 +54,11 @@ http://<zimaos-host>/modules/zima-display/index.html
 ## Usage
 
 1. Connect the display before switching HDMI modes.
-2. Select **System dashboard**, **Free canvas**, **Ambient clock**, **Black standby**, or **Restore terminal**.
-3. Open **Display settings** to adjust dashboard font size and layout, then preview or save and apply it to HDMI.
+2. Choose **Ready-made view**, **Free canvas**, or **Media**; the page opens one task at a time.
+3. Customize the System dashboard title, layout, type size and preview in the main Ready-made workspace. Settings only chooses which configured mode opens at startup.
 4. In **Free canvas**, apply a template or add widgets, drag to position, resize from the lower-right corner, or enter exact X/Y/W/H values.
 5. Customize each widget's font size, color and weight, and choose a solid, gradient or uploaded-image background.
-6. Configure the startup mode, DRM/Wayland backend, language, media folders and audio device in Display settings.
+6. Use Settings for startup behavior, Display output, media folders, remote data sources and screen maintenance.
 7. Use the media panel to browse files, upload media, or play a network URL.
 
 The web UI follows the browser language on first use. A manual language selection synchronizes the web UI and HDMI dashboard, and is stored both in the browser and the device `config.json`.
@@ -85,6 +85,8 @@ go run ./cmd/zima-displayd \
 ```
 
 Open `http://127.0.0.1:8787/`. HDMI operations are unavailable on systems without Linux, systemd and DRM, but the web UI and API can still be developed locally.
+
+The complete release gates, test matrix and hardware acceptance procedure are documented in [docs/testing.md](docs/testing.md).
 
 ## Build and deploy
 
@@ -135,8 +137,11 @@ DeepSeek Harness and other automation clients can use the packaged `zima-display
 | `GET` | `/zima-display/api/health` | Health and version |
 | `GET` | `/zima-display/api/status` | Player, system and display status |
 | `GET/PUT` | `/zima-display/api/config` | Read or update settings |
+| `GET/POST` | `/zima-display/api/sources` | List or add an SSH metrics source |
+| `DELETE` | `/zima-display/api/sources/{id}` | Remove an SSH metrics source |
 | `POST` | `/zima-display/api/preview/dashboard` | Preview unsaved dashboard settings |
 | `POST` | `/zima-display/api/preview/canvas` | Preview an unsaved free-canvas layout |
+| `GET` | `/zima-display/api/preview/frame` | Capture the frame currently rendered by mpv |
 | `POST` | `/zima-display/api/action` | Change modes and control playback |
 | `GET` | `/zima-display/api/media` | Browse allowed media folders |
 | `POST` | `/zima-display/api/upload` | Upload a video or image |
@@ -147,7 +152,7 @@ DeepSeek Harness and other automation clients can use the packaged `zima-display
 | `POST` | `/zima-display/api/v1/presentation/previous` | Show the previous page (Bearer Token) |
 | `POST` | `/zima-display/api/v1/presentation/stop` | Stop presenting (Bearer Token) |
 
-Media access is restricted to `/DATA`, `/media`, `/mnt` and the application data directory. The API does not accept arbitrary system commands.
+Media access is restricted to `/DATA`, `/media`, `/mnt` and the application data directory. Remote Linux metrics use read-only SSH commands without sudo. SSH passwords are stored separately in a mode-`0600` secrets file and are never returned by the API.
 
 ## Recovery
 

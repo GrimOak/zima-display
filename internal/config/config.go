@@ -30,6 +30,12 @@ type Dashboard struct {
 	RefreshIntervalMS int     `json:"refresh_interval_ms"`
 }
 
+type MediaSettings struct {
+	SingleVideoEnd           string `json:"single_video_end"`
+	CollectionEnd            string `json:"collection_end"`
+	SlideshowIntervalSeconds int    `json:"slideshow_interval_seconds"`
+}
+
 type Automation struct {
 	Enabled bool   `json:"enabled"`
 	Token   string `json:"token"`
@@ -38,6 +44,7 @@ type Automation struct {
 type CanvasWidget struct {
 	ID       string `json:"id"`
 	Type     string `json:"type"`
+	SourceID string `json:"source_id,omitempty"`
 	Text     string `json:"text,omitempty"`
 	X        int    `json:"x"`
 	Y        int    `json:"y"`
@@ -46,6 +53,16 @@ type CanvasWidget struct {
 	FontSize int    `json:"font_size"`
 	Color    string `json:"color"`
 	Bold     bool   `json:"bold"`
+}
+
+type RemoteSource struct {
+	ID                  string `json:"id"`
+	Name                string `json:"name"`
+	Host                string `json:"host"`
+	Port                int    `json:"port"`
+	User                string `json:"user"`
+	HostKey             string `json:"host_key"`
+	PollIntervalSeconds int    `json:"poll_interval_seconds"`
 }
 
 type Canvas struct {
@@ -57,15 +74,17 @@ type Canvas struct {
 }
 
 type Config struct {
-	DataDir     string     `json:"data_dir"`
-	MediaRoots  []string   `json:"media_roots"`
-	DefaultMode string     `json:"default_mode"`
-	AutoStart   bool       `json:"auto_start_display"`
-	Volume      int        `json:"volume"`
-	Renderer    Renderer   `json:"renderer"`
-	Dashboard   Dashboard  `json:"dashboard"`
-	Canvas      Canvas     `json:"canvas"`
-	Automation  Automation `json:"automation"`
+	DataDir     string         `json:"data_dir"`
+	MediaRoots  []string       `json:"media_roots"`
+	Media       MediaSettings  `json:"media"`
+	DefaultMode string         `json:"default_mode"`
+	AutoStart   bool           `json:"auto_start_display"`
+	Volume      int            `json:"volume"`
+	Renderer    Renderer       `json:"renderer"`
+	Dashboard   Dashboard      `json:"dashboard"`
+	Canvas      Canvas         `json:"canvas"`
+	Sources     []RemoteSource `json:"sources,omitempty"`
+	Automation  Automation     `json:"automation"`
 }
 
 type Store struct {
@@ -116,13 +135,18 @@ func (s *Store) Replace(cfg Config) error {
 
 func Default() Config {
 	return Config{
-		DataDir:     DefaultDataDir,
-		MediaRoots:  []string{"/DATA"},
+		DataDir:    DefaultDataDir,
+		MediaRoots: []string{"/DATA"},
+		Media: MediaSettings{
+			SingleVideoEnd:           "repeat",
+			CollectionEnd:            "repeat",
+			SlideshowIntervalSeconds: 8,
+		},
 		DefaultMode: "dashboard",
 		AutoStart:   true,
 		Volume:      70,
 		Renderer: Renderer{
-			Backend:     "auto",
+			Backend:     "drm",
 			Resolution:  "auto",
 			AudioDevice: "auto",
 		},
@@ -214,6 +238,24 @@ func (c *Config) Validate() error {
 		}
 		c.MediaRoots[i] = clean
 	}
+	if c.Media.SingleVideoEnd == "" {
+		c.Media.SingleVideoEnd = "repeat"
+	}
+	if !oneOf(c.Media.SingleVideoEnd, "repeat", "stop") {
+		return fmt.Errorf("unsupported single video end behavior %q", c.Media.SingleVideoEnd)
+	}
+	if c.Media.CollectionEnd == "" {
+		c.Media.CollectionEnd = "repeat"
+	}
+	if !oneOf(c.Media.CollectionEnd, "repeat", "stop") {
+		return fmt.Errorf("unsupported collection end behavior %q", c.Media.CollectionEnd)
+	}
+	if c.Media.SlideshowIntervalSeconds == 0 {
+		c.Media.SlideshowIntervalSeconds = 8
+	}
+	if !oneOfInt(c.Media.SlideshowIntervalSeconds, 3, 5, 8, 10, 15, 30) {
+		return errors.New("slideshow interval must be one of 3, 5, 8, 10, 15, or 30 seconds")
+	}
 	if !oneOf(c.DefaultMode, "dashboard", "canvas", "clock", "black", "terminal") {
 		return fmt.Errorf("unsupported default mode %q", c.DefaultMode)
 	}
@@ -270,6 +312,44 @@ func (c *Config) Validate() error {
 		}
 		c.Canvas.BackgroundImage = clean
 	}
+	if len(c.Sources) > 20 {
+		return errors.New("at most 20 remote data sources are supported")
+	}
+	seenSources := make(map[string]struct{}, len(c.Sources))
+	for i := range c.Sources {
+		source := &c.Sources[i]
+		source.ID = strings.TrimSpace(source.ID)
+		source.Name = strings.TrimSpace(source.Name)
+		source.Host = strings.TrimSpace(source.Host)
+		source.User = strings.TrimSpace(source.User)
+		if source.ID == "" || source.ID == "local" {
+			return errors.New("remote source id cannot be empty or local")
+		}
+		for _, char := range source.ID {
+			if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '-' || char == '_') {
+				return fmt.Errorf("remote source id %q may only contain letters, numbers, hyphens, and underscores", source.ID)
+			}
+		}
+		if _, exists := seenSources[source.ID]; exists {
+			return fmt.Errorf("duplicate remote source id %q", source.ID)
+		}
+		seenSources[source.ID] = struct{}{}
+		if source.Name == "" || source.Host == "" || source.User == "" {
+			return fmt.Errorf("remote source %q requires name, host, and user", source.ID)
+		}
+		if source.Port == 0 {
+			source.Port = 22
+		}
+		if source.Port < 1 || source.Port > 65535 {
+			return fmt.Errorf("remote source %q has an invalid port", source.ID)
+		}
+		if source.PollIntervalSeconds == 0 {
+			source.PollIntervalSeconds = 5
+		}
+		if source.PollIntervalSeconds < 3 || source.PollIntervalSeconds > 300 {
+			return fmt.Errorf("remote source %q poll interval must be between 3 and 300 seconds", source.ID)
+		}
+	}
 	seenWidgets := make(map[string]struct{}, len(c.Canvas.Widgets))
 	for i := range c.Canvas.Widgets {
 		widget := &c.Canvas.Widgets[i]
@@ -283,6 +363,18 @@ func (c *Config) Validate() error {
 		seenWidgets[widget.ID] = struct{}{}
 		if !oneOf(widget.Type, "clock", "date", "cpu", "memory", "storage", "temperature", "ip", "hostname", "network", "text") {
 			return fmt.Errorf("unsupported canvas widget type %q", widget.Type)
+		}
+		widget.SourceID = strings.TrimSpace(widget.SourceID)
+		if widget.SourceID == "local" {
+			widget.SourceID = ""
+		}
+		if widget.SourceID != "" {
+			if !oneOf(widget.Type, "cpu", "memory", "storage", "temperature", "ip", "hostname", "network") {
+				return fmt.Errorf("canvas widget %q cannot use a remote data source", widget.ID)
+			}
+			if _, exists := seenSources[widget.SourceID]; !exists {
+				return fmt.Errorf("canvas widget %q references unknown source %q", widget.ID, widget.SourceID)
+			}
 		}
 		if widget.X < 0 || widget.Y < 0 || widget.Width < 80 || widget.Height < 30 || widget.X+widget.Width > 1920 || widget.Y+widget.Height > 1080 {
 			return fmt.Errorf("canvas widget %q is outside the 1920x1080 canvas", widget.ID)
@@ -333,9 +425,19 @@ func oneOf(value string, choices ...string) bool {
 	return false
 }
 
+func oneOfInt(value int, choices ...int) bool {
+	for _, choice := range choices {
+		if value == choice {
+			return true
+		}
+	}
+	return false
+}
+
 func clone(cfg Config) Config {
 	cfg.MediaRoots = append([]string(nil), cfg.MediaRoots...)
 	cfg.Canvas.Widgets = append([]CanvasWidget(nil), cfg.Canvas.Widgets...)
+	cfg.Sources = append([]RemoteSource(nil), cfg.Sources...)
 	return cfg
 }
 

@@ -34,12 +34,20 @@ jobs:
           node --check web/app.js
           node scripts/check-i18n.mjs
           node scripts/test-web-language.mjs
+          node scripts/test-home-ui.mjs
+          node scripts/test-settings-ui.mjs
 
       - name: Check shell syntax
         run: sh -n scripts/*.sh packaging/raw/usr/libexec/zima-display/start-renderer
 
+      - name: Test renderer fallback
+        run: ./scripts/test-renderer-fallback.sh
+
       - name: Build native package
         run: ./scripts/build.sh amd64
+
+      - name: Test native package
+        run: ./scripts/test-package.sh
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7

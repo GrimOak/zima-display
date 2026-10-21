@@ -13,6 +13,7 @@ Zima Display 是一个面向 ZimaOS 的原生 HDMI 输出控制应用。它通�
 - 系统仪表盘支持 80%–200% 字号、自动/标准/大字布局，以及与 HDMI 同数据、同坐标的实时预览。
 - 自由画布模式：拖拽和缩放组件，自定义字号、颜色、粗体、文字与背景，并可直接预览后投屏。
 - 自由画布内置系统概览、巨型时钟和极简状态模板，支持纯色、渐变和上传图片背景。
+- 可在设置中通过 SSH 添加其他 Linux/ZimaOS 设备，并让自由画布的 CPU、内存、存储、网络、温度、IP、主机名组件分别选择数据来源。
 - 选择显示语言后，Web 控制页和 HDMI 仪表盘会同步切换。
 - 系统仪表盘、环境时钟、黑屏待机、媒体播放和恢复终端模式。
 - 本地视频和图片浏览、无限循环播放队列以及最大 20 GB 的媒体上传。
@@ -54,12 +55,14 @@ http://<zimaos-host>/modules/zima-display/index.html
 ## 使用
 
 1. 切换 HDMI 模式前先连接显示器。
-2. 在控制页选择“系统仪表盘”“自由画布”“环境时钟”“黑屏待机”或“恢复终端”。
-3. 打开“显示设置”，调整仪表盘字号和布局；预览确认后可“保存并应用到 HDMI”。
-4. 在“自由画布”中套用模板或添加组件，拖动组件调整位置，拖动右下角调整大小，也可精确填写 X/Y/W/H。
-5. 自由画布支持每个组件单独设置字号、颜色和粗体，并可使用纯色、渐变或上传图片作为背景。
-6. 在显示设置中配置开机模式、DRM/Wayland 后端、显示语言、媒体目录和音频设备。
-7. 在媒体面板浏览或上传文件，也可以直接输入网络媒体地址播放。
+2. 在控制页先选择“现成画面”“自由画布”或“媒体”，页面一次只展开当前任务。
+3. “查看当前屏幕”只用于确认实时 HDMI 画面；播放控制位于媒体工作区，黑屏待机和恢复终端位于设置中的“屏幕维护”。
+4. 系统仪表盘的标题、布局、字号和预览在主页面的“现成画面”中调整；设置页只选择开机进入哪个模式。
+5. 在“自由画布”中套用模板或添加组件，拖动组件调整位置，拖动右下角调整大小，也可精确填写 X/Y/W/H。
+6. 自由画布支持每个组件单独设置字号、颜色和粗体；指标组件还可选择本机或已添加的远程设备。
+7. 在设置中配置开机画面；显示输出、媒体目录、远程设备数据和屏幕维护按需展开。
+8. 添加远程设备只需普通 SSH 账号，不需要 sudo。密码仅保存在 Zima Display 设备本机的 `0600` secrets 文件中。
+9. 在媒体面板浏览或上传文件，也可以直接输入网络媒体地址播放。
 
 ## DeepSeek Harness 集成
 
@@ -93,6 +96,8 @@ go run ./cmd/zima-displayd \
 ```
 
 浏览器打开 `http://127.0.0.1:8787/`。非 Linux/systemd/DRM 环境仍可开发 Web 界面和 API，但 HDMI 操作不可用。
+
+完整的发布门槛、测试矩阵和真机验收流程见 [docs/testing.md](docs/testing.md)。
 
 ## 构建与部署
 
@@ -143,8 +148,11 @@ DeepSeekHarness、脚本或其他自动化工具可以使用随包安装的 `zim
 | `GET` | `/zima-display/api/health` | 健康状态和版本 |
 | `GET` | `/zima-display/api/status` | 播放器、系统和显示状态 |
 | `GET/PUT` | `/zima-display/api/config` | 获取或保存设置 |
+| `GET/POST` | `/zima-display/api/sources` | 查看或添加 SSH 指标数据源 |
+| `DELETE` | `/zima-display/api/sources/{id}` | 删除 SSH 指标数据源 |
 | `POST` | `/zima-display/api/preview/dashboard` | 预览尚未保存的仪表盘布局 |
 | `POST` | `/zima-display/api/preview/canvas` | 预览尚未保存的自由画布布局 |
+| `GET` | `/zima-display/api/preview/frame` | 获取 mpv 当前正在输出的画面帧 |
 | `POST` | `/zima-display/api/action` | 切换模式和控制播放 |
 | `GET` | `/zima-display/api/media` | 浏览允许的媒体目录 |
 | `POST` | `/zima-display/api/upload` | 上传视频或图片 |
@@ -155,7 +163,7 @@ DeepSeekHarness、脚本或其他自动化工具可以使用随包安装的 `zim
 | `POST` | `/zima-display/api/v1/presentation/previous` | 上一页（Bearer Token） |
 | `POST` | `/zima-display/api/v1/presentation/stop` | 停止展示（Bearer Token） |
 
-媒体访问被限制在 `/DATA`、`/media`、`/mnt` 和应用数据目录内，API 不接受任意系统命令。
+媒体访问被限制在 `/DATA`、`/media`、`/mnt` 和应用数据目录内，API 不接受任意系统命令。远程采集只执行内置的只读 Linux 指标命令，SSH 密码不会通过配置或状态 API 返回。
 
 ## 恢复终端
 
