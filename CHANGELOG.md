@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file. The project fol
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-10-23
+
+### Changed
+
+- Aligned the Web control surface with the ZimaOS Files visual system using cool-gray surfaces, ZimaOS blue accents, compact controls, softer panel depth and responsive mobile layouts.
+- Replaced the content-mode symbols and application icon with a consistent display-oriented icon set.
+- Versioned Web CSS, JavaScript and icon URLs so upgrades cannot retain stale interface assets.
+
 ### Fixed
 
 - Recovered the persistent local package after reboot when ZimaOS does not restore its volatile system-extension registration. A standalone helper in `/etc` waits for storage, registers only Zima Display through `/run/extensions`, merges it and starts the control service.

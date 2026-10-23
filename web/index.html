@@ -6,8 +6,8 @@
     <meta name="color-scheme" content="light">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Zima Display</title>
-    <link rel="icon" type="image/svg+xml" href="appicon.svg">
-    <link rel="stylesheet" href="styles.css?v=0.4.3">
+    <link rel="icon" type="image/svg+xml" href="appicon.svg?v=0.4.4">
+    <link rel="stylesheet" href="styles.css?v=0.4.4">
   </head>
   <body>
     <div class="grain" aria-hidden="true"></div>
@@ -49,13 +49,13 @@
         <div class="guided-section-heading"><span>01</span><div><h2 id="contentPickerHeading" data-i18n="home.chooseHeading">选择内容类型</h2><p data-i18n="home.chooseDescription">三种方式互不干扰，一次只处理一种。</p></div></div>
         <div class="content-choice-grid">
           <button class="content-choice active" type="button" data-workspace-choice="dashboard" aria-pressed="true">
-            <span class="choice-number">01</span><span class="choice-icon" aria-hidden="true">◫</span><span><b data-i18n="home.choiceDashboard">使用现成画面</b><small data-i18n="home.choiceDashboardHint">直接显示系统状态或时钟</small></span><em data-i18n="settings.recommended">推荐</em>
+            <span class="choice-number">01</span><span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3M7 8h4v6H7zM14 8h3M14 11h3M14 14h3"/></svg></span><span><b data-i18n="home.choiceDashboard">使用现成画面</b><small data-i18n="home.choiceDashboardHint">直接显示系统状态或时钟</small></span><em data-i18n="settings.recommended">推荐</em>
           </button>
           <button class="content-choice" type="button" data-workspace-choice="canvas" aria-pressed="false">
-            <span class="choice-number">02</span><span class="choice-icon" aria-hidden="true">⌗</span><span><b data-i18n="home.choiceCanvas">设计自由画布</b><small data-i18n="home.choiceCanvasHint">从模板开始，再调整组件和背景</small></span><i aria-hidden="true">→</i>
+            <span class="choice-number">02</span><span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M7 4v16M17 4v16"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></span><span><b data-i18n="home.choiceCanvas">设计自由画布</b><small data-i18n="home.choiceCanvasHint">从模板开始，再调整组件和背景</small></span><i aria-hidden="true">→</i>
           </button>
           <button class="content-choice" type="button" data-workspace-choice="media" aria-pressed="false">
-            <span class="choice-number">03</span><span class="choice-icon" aria-hidden="true">▶</span><span><b data-i18n="home.choiceMedia">播放照片或视频</b><small data-i18n="home.choiceMediaHint">选择文件、文件夹或网络地址</small></span><i aria-hidden="true">→</i>
+            <span class="choice-number">03</span><span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></span><span><b data-i18n="home.choiceMedia">播放照片或视频</b><small data-i18n="home.choiceMediaHint">选择文件、文件夹或网络地址</small></span><i aria-hidden="true">→</i>
           </button>
         </div>
       </section>
@@ -300,6 +300,6 @@
     </dialog>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <script src="app.js?v=0.4.3"></script>
+    <script src="app.js?v=0.4.4"></script>
   </body>
 </html>
