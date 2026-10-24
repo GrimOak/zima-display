@@ -1,3 +1,5 @@
+# THIS APP IS NOT AFFECTED BY "PHP2SHELL" EXPLOITS/ VULNERABILITES 
+
 # Zima Display
 
 [简体中文](README.zh-CN.md) | English
